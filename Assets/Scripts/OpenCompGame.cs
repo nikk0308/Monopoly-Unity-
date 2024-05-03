@@ -13,7 +13,7 @@ public class OpenCompGame : MonoBehaviour
             return;
         }
         PlayerInfoManager.Instance.CreateOwner();
-        ChangeInfo first = PlayerInfoManager.Instance.PlayerInfo.GetAt(^1);
+        ChangeInfo first = PlayerInfoManager.Instance.PlayerInfo[^1];
         first.playerName.text = "Грак";
     }
 }

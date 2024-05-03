@@ -19,5 +19,11 @@ public class BotInfo : MonoBehaviour
         exit.onClick.AddListener(() => PlayerInfoManager.Instance.DeletePlayerInfo(this));
         edit.onClick.AddListener(() => ScriptChooseColor.Instance.StartEditing(new ChangeInfo(NamePlayer, ColorChip)));
     }
+
+    public void BotTypeChanged() {
+        var index = transform.GetSiblingIndex();
+        int newPickedType = botType.value;
+        PlayerInfoManager.Instance.BotsIndexes[index] = newPickedType;
+    }
 }
 

@@ -426,10 +426,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 6334853987766412499}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.9, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -20, y: -20}
-  m_SizeDelta: {x: -48, y: -30}
+  m_AnchorMin: {x: 0.92, y: 0.1}
+  m_AnchorMax: {x: 0.99, y: 0.9}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &9192984050128001310
 CanvasRenderer:
@@ -461,7 +461,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 81bf241631df2c644afc94afa0ac1001, type: 3}
   m_Type: 0
-  m_PreserveAspect: 1
+  m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -625,7 +625,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorChip: {fileID: 769997577772473438}
   namePlayer: {fileID: 2402293181928027401}
-  botType: {fileID: 0}
+  botType: {fileID: 1292498496789987041}
   edit: {fileID: 3922661717775699614}
   exit: {fileID: 5526375634286292797}
 --- !u!1 &4794127309707150493
@@ -765,7 +765,19 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2130628150538192576}
+        m_TargetAssemblyTypeName: BotInfo, Assembly-CSharp
+        m_MethodName: BotTypeChanged
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!1 &5883794406173820382
 GameObject:
@@ -1203,10 +1215,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 6334853987766412499}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.8, y: 0}
-  m_AnchorMax: {x: 0.9, y: 1}
-  m_AnchoredPosition: {x: 41, y: -25}
-  m_SizeDelta: {x: -58, y: -45}
+  m_AnchorMin: {x: 0.83, y: 0.1}
+  m_AnchorMax: {x: 0.9, y: 0.9}
+  m_AnchoredPosition: {x: 10, y: -10}
+  m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &6721867502491607879
 CanvasRenderer:
@@ -1238,7 +1250,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 4cca790af4afff04e9052ac7dbed516b, type: 3}
   m_Type: 0
-  m_PreserveAspect: 1
+  m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -1458,7 +1470,7 @@ RectTransform:
   m_Father: {fileID: 6334853987766412499}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.4, y: 0}
-  m_AnchorMax: {x: 0.73, y: 1}
+  m_AnchorMax: {x: 0.75, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1533,8 +1545,8 @@ RectTransform:
   - {fileID: 4038814521721565342}
   m_Father: {fileID: 6334853987766412499}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.73, y: 0}
-  m_AnchorMax: {x: 0.8, y: 1}
+  m_AnchorMin: {x: 0.75, y: 0}
+  m_AnchorMax: {x: 0.82, y: 1}
   m_AnchoredPosition: {x: -15, y: 0}
   m_SizeDelta: {x: 10, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}

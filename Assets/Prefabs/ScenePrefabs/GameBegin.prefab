@@ -98,6 +98,7 @@ MonoBehaviour:
   parent: {fileID: 1247503982759142976}
   create: {fileID: 2729215425479349239}
   close: {fileID: 6304789785590890579}
+  startGame: {fileID: 171267768997219651}
   title: {fileID: 912197725478245093}
   isWithBots: 0
 --- !u!1 &82755150419235487
@@ -1210,7 +1211,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -1596,10 +1597,10 @@ RectTransform:
   - {fileID: 244449076049878126}
   m_Father: {fileID: 7973971506125651562}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.9, y: 0.05}
   m_AnchorMax: {x: 1, y: 0.2}
-  m_AnchoredPosition: {x: 870, y: 30}
-  m_SizeDelta: {x: -1740, y: -60}
+  m_AnchoredPosition: {x: 5, y: 0}
+  m_SizeDelta: {x: -10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5808219858981116685
 CanvasRenderer:
