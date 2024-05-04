@@ -4,10 +4,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class PlayerInfoManager : MonoBehaviour 
 {
-    [SerializeField] private BotInfo objectBotInfo;
+    [SerializeField] private PlayerInfo objectBotInfo;
     [SerializeField] private PlayerInfo objectPlayerInfo;
     [SerializeField] private PlayerInfo objectOwnerInfo;
     
@@ -16,14 +17,16 @@ public class PlayerInfoManager : MonoBehaviour
     [SerializeField] private Button close;
     [SerializeField] private Button startGame;
     [SerializeField] private TMP_Text title;
+
+    [SerializeField] private Image errorWindow;
+    [SerializeField] private TMP_Text errorText;
+    [SerializeField] private Button closeError;
     public bool isWithBots;
 
-    private List<ChangeInfo> _playerInfo = new();
-    private List<int> _botsIndexes = new();
-    private int maxPlayersAmount = 6;
+    private List<PlayerInfo> _playerInfo = new();
+    private List<string> _defaultNames = new();
 
-    public List<ChangeInfo> PlayerInfo => _playerInfo;
-    public List<int> BotsIndexes => _botsIndexes;
+    public List<PlayerInfo> PlayerInform => _playerInfo;
     public static PlayerInfoManager Instance { get; private set; }     
     private void Awake() 
     {
@@ -39,6 +42,8 @@ public class PlayerInfoManager : MonoBehaviour
     private void Start() {
         close.onClick.AddListener(CloseWindow);
         startGame.onClick.AddListener(StartGame);
+        closeError.onClick.AddListener(CloseError);
+        NamesFill();
         CloseWindow();
     }
     public void OnEnable()
@@ -56,32 +61,27 @@ public class PlayerInfoManager : MonoBehaviour
     
     private void CreateBot() {
         var botInfo = Instantiate(objectBotInfo, parent);
-        SetDefaultPlayerValue(botInfo.NamePlayer, botInfo.ColorChip);
-        if (_playerInfo.Count >= maxPlayersAmount) {
-            create.enabled = false;
-        }
-        _botsIndexes.Add(0);
+        SetDefaultPlayerValue(botInfo);
     }
     
     private void CreatePlayer() {
         var playerInfo = Instantiate(objectPlayerInfo, parent);
-        SetDefaultPlayerValue(playerInfo.NamePlayer, playerInfo.ColorChip);
-        if (_playerInfo.Count >= maxPlayersAmount) {
-            create.enabled = false;
-        }
-        _botsIndexes.Add(-1);
+        SetDefaultPlayerValue(playerInfo);
     }
     
     public void CreateOwner() {
         var ownerInfo = Instantiate(objectOwnerInfo, parent);
-        SetDefaultPlayerValue(ownerInfo.NamePlayer, ownerInfo.ColorChip);
-        _botsIndexes.Add(-1);
+        SetDefaultPlayerValue(ownerInfo);
+        ownerInfo.NamePlayer.text = "Грак";
     }
 
-    private void SetDefaultPlayerValue(TMP_Text namePlayer, Image colorPlayer) {
-        colorPlayer.color = new Color(1f, 1f, 1f);
-        namePlayer.text = "Гравець №" + Convert.ToString(_playerInfo.Count + 1);
-        AddElementToList(namePlayer, colorPlayer);
+    private void SetDefaultPlayerValue(PlayerInfo newPlayer) {
+        newPlayer.ColorChip.color = new Color(1f, 1f, 1f);
+        newPlayer.NamePlayer.text = RandUniqueName();
+        _playerInfo.Add(newPlayer);
+        if (_playerInfo.Count >= Constants.MaxPlayersAmount) {
+            create.enabled = false;
+        }
     }
 
     private void CloseWindow() {
@@ -89,61 +89,68 @@ public class PlayerInfoManager : MonoBehaviour
             Destroy(child.gameObject);
         }
         _playerInfo = new();
+        create.enabled = true;
         gameObject.SetActive(false);
     }
 
-    public void DeletePlayerInfo(BotInfo botInfo) {
-        var index = botInfo.transform.GetSiblingIndex();
+    public void DeletePlayerInfo(PlayerInfo playerInfo) {
+        var index = playerInfo.transform.GetSiblingIndex();
         _playerInfo.RemoveAt(index);
-        _botsIndexes.RemoveAt(index);
-        Destroy(botInfo.gameObject);
-        if (_playerInfo.Count < maxPlayersAmount) {
+        Destroy(playerInfo.gameObject);
+        if (_playerInfo.Count < Constants.MaxPlayersAmount) {
             create.enabled = true;
         }
-    }
-    public void DeletePlayerInfo(PlayerInfo botInfo) {
-        var index = botInfo.transform.GetSiblingIndex();
-        _playerInfo.RemoveAt(index);
-        Destroy(botInfo.gameObject);
-        if (_playerInfo.Count < maxPlayersAmount) {
-            create.enabled = true;
-        }
-    }
-    
-    public void AddElementToList(TMP_Text nameInfo, Image colorInfo) {
-        ChangeInfo changeInfo = new ChangeInfo(nameInfo, colorInfo);
-        _playerInfo.Add(changeInfo);
     }
 
     private void StartGame() {
+        if (_playerInfo.Count < Constants.MinPlayersAmount) {
+            ShowError("Недостатня кількість гравців");
+            return;
+        }
+
+        string output = "\n";
         for (int i = 0; i < _playerInfo.Count; i++) {
-            Debug.Log(_playerInfo[i].playerName.text + " | " + _playerInfo[i].chipColor.color + " | " + _botsIndexes[i]);
+            output += _playerInfo[i].NamePlayer.text + " | " + _playerInfo[i].ColorChip.color + " | " +
+                      (_playerInfo[i].BotType == null ? "немає" : Convert.ToString(_playerInfo[i].BotType.value)) + "\n";
+        }
+        Debug.Log(output);
+    }
+
+    public void ShowError(string errorText) {
+        this.errorText.text = errorText;
+        errorWindow.gameObject.SetActive(true);
+    }
+
+    public bool IsPlayerNameAlreadyExist(string playerName, int nameIndex = -1) {
+        for (int i = 0; i < _playerInfo.Count; i++) {
+            if (playerName == _playerInfo[i].NamePlayer.text && nameIndex != i) {
+                return true;
+            }
+        }
+        foreach (var player in _playerInfo) {
+        }
+        return false;
+    }
+
+    private void CloseError() {
+        errorWindow.gameObject.SetActive(false);
+    }
+    private void NamesFill() {
+        var fileNames = Resources.Load<TextAsset>("text_info/names_for_bots/normal_names").ToString();
+        int startIndex = 0;
+        int findIndex = fileNames.IndexOf('\n', startIndex);
+        while (findIndex != -1) {
+            _defaultNames.Add(fileNames.Substring(startIndex, findIndex - startIndex));
+            startIndex = findIndex + 1;
+            findIndex = fileNames.IndexOf('\n', startIndex);
         }
     }
-}
 
-public class PlayersList {
-    private List<ChangeInfo> list = new();
-    
-    public void AddElement(TMP_Text nameInfo, Image colorInfo) {
-        ChangeInfo changeInfo = new ChangeInfo(nameInfo, colorInfo);
-        list.Add(changeInfo);
-    }
-
-    public void RemoveAt(int index) {
-        list.RemoveAt(index);
-    }
-
-    public ChangeInfo GetAt(Index index) {
-        return list[index];
-    }
-
-    public int Count() {
-        return list.Count;
-    }
-
-    public void DeleteAll() {
-        list = new();
+    private string RandUniqueName() {
+        string nameToReturn;
+        do {
+            nameToReturn = _defaultNames[Constants.Rand.Next(0, _defaultNames.Count)];
+        } while (IsPlayerNameAlreadyExist(nameToReturn));
+        return nameToReturn;
     }
 }
-

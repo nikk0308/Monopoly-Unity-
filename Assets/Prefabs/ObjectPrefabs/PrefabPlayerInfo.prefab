@@ -208,7 +208,7 @@ GameObject:
   - component: {fileID: 7164792738220648114}
   - component: {fileID: 4749537235272790774}
   - component: {fileID: 1961898965781246037}
-  - component: {fileID: 8070636198238069609}
+  - component: {fileID: 7545098771573288016}
   m_Layer: 5
   m_Name: PrefabPlayerInfo
   m_TagString: Untagged
@@ -294,7 +294,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8070636198238069609
+--- !u!114 &7545098771573288016
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -303,11 +303,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 3747452946000869399}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72c893646fdd4ab2b89df4d5538ff535, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a7c382c6ea61f5439def2e14fc980c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   colorChip: {fileID: 769997577772473438}
   namePlayer: {fileID: 2402293181928027401}
+  botType: {fileID: 0}
   edit: {fileID: 7554155197692343161}
   exit: {fileID: 1847617159192304273}
 --- !u!1 &6061293773977747082
@@ -452,8 +453,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u0413\u0440\u0430\u0432\u0435\u0446\u044C 1"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
+  m_sharedMaterial: {fileID: 2164040, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -483,7 +484,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 50
   m_fontSizeMax: 80
-  m_fontStyle: 1
+  m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535

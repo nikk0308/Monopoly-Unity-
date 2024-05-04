@@ -93,13 +93,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectBotInfo: {fileID: 2130628150538192576, guid: defb6e2b799f0dd4a8a93d5e2df2cc6f, type: 3}
-  objectPlayerInfo: {fileID: 8070636198238069609, guid: 07401946332d4684fbbdf14bf8e1e3f0, type: 3}
-  objectOwnerInfo: {fileID: 809913991533692307, guid: f730865017010d4448779edd94c9f737, type: 3}
+  objectPlayerInfo: {fileID: 7545098771573288016, guid: 07401946332d4684fbbdf14bf8e1e3f0, type: 3}
+  objectOwnerInfo: {fileID: 2274367705081165110, guid: f730865017010d4448779edd94c9f737, type: 3}
   parent: {fileID: 1247503982759142976}
   create: {fileID: 2729215425479349239}
   close: {fileID: 6304789785590890579}
   startGame: {fileID: 171267768997219651}
   title: {fileID: 912197725478245093}
+  errorWindow: {fileID: 0}
+  errorText: {fileID: 0}
+  closeError: {fileID: 0}
   isWithBots: 0
 --- !u!1 &82755150419235487
 GameObject:
@@ -369,8 +372,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4279250497
+  m_fontColor: {r: 0.254717, g: 0.17945969, b: 0.06367925, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -393,7 +396,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 60
   m_fontSizeMax: 80
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -531,6 +534,7 @@ GameObject:
   - component: {fileID: 343210152885027294}
   - component: {fileID: 1895152848814205623}
   - component: {fileID: 171267768997219651}
+  - component: {fileID: 6261515308644802704}
   m_Layer: 5
   m_Name: FinishInput
   m_TagString: Untagged
@@ -579,7 +583,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6603774, g: 0.57430285, b: 0.4828231, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -640,6 +644,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6261515308644802704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297855673233706584}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0.12283648, g: 0.11302953, b: 0.18867922, a: 0.5803922}
+  m_EffectDistance: {x: 5, y: 5}
+  m_UseGraphicAlpha: 0
 --- !u!1 &4353759992963576639
 GameObject:
   m_ObjectHideFlags: 0

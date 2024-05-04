@@ -9,7 +9,7 @@ public class ScriptChooseColor : MonoBehaviour, IPointerClickHandler {
     [SerializeField] private TMP_InputField nameInputField;
     [SerializeField] private Button save;
 
-    private ChangeInfo _objectToEdit;
+    private PlayerInfo _objectToEdit;
     public static ScriptChooseColor Instance { get; private set; }     
     private void Awake() 
     {
@@ -23,6 +23,7 @@ public class ScriptChooseColor : MonoBehaviour, IPointerClickHandler {
     }
 
     private void Start() {
+        nameInputField.characterLimit = Constants.MaxNameLength;
         save.onClick.AddListener(Save);
     }
 
@@ -47,24 +48,30 @@ public class ScriptChooseColor : MonoBehaviour, IPointerClickHandler {
 
 
     private void Save() {
-        _objectToEdit.chipColor.color = imageToShow.color;
-        _objectToEdit.playerName.text = nameInputField.text;
+        if (!IsInputCorrect()) {
+            return;
+        }
+        _objectToEdit.ColorChip.color = imageToShow.color;
+        _objectToEdit.NamePlayer.text = nameInputField.text;
         gameObject.SetActive(false);
     }
+
+    private bool IsInputCorrect() {
+        if (nameInputField.text.Length < Constants.MinNameLength) {
+            PlayerInfoManager.Instance.ShowError("Ім'я занадто мале");
+            return false;
+        }
+        if (PlayerInfoManager.Instance.IsPlayerNameAlreadyExist(nameInputField.text, _objectToEdit.transform.GetSiblingIndex())) {
+            PlayerInfoManager.Instance.ShowError("Таке ім'я вже існує");
+            return false;
+        }
+        return true;
+    }
     
-    public void StartEditing(ChangeInfo changeInfo) {
+    public void StartEditing(PlayerInfo changeInfo) {
         _objectToEdit = changeInfo;
         gameObject.SetActive(true);
-        imageToShow.color = changeInfo.chipColor.color;
-        nameInputField.text = changeInfo.playerName.text;
-    }
-}
-
-public class ChangeInfo {
-    public TMP_Text playerName;
-    public Image chipColor;
-    public ChangeInfo(TMP_Text playerName, Image chipColor) {
-        this.playerName = playerName;
-        this.chipColor = chipColor;
+        imageToShow.color = changeInfo.ColorChip.color;
+        nameInputField.text = changeInfo.NamePlayer.text;
     }
 }
