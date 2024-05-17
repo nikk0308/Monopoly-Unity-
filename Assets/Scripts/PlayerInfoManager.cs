@@ -21,6 +21,8 @@ public class PlayerInfoManager : MonoBehaviour
     [SerializeField] private Image errorWindow;
     [SerializeField] private TMP_Text errorText;
     [SerializeField] private Button closeError;
+    
+    [SerializeField] private Image playGameWindow;
     public bool isWithBots;
 
     private List<PlayerInfo> _playerInfo = new();
@@ -108,6 +110,7 @@ public class PlayerInfoManager : MonoBehaviour
             return;
         }
 
+        playGameWindow.gameObject.SetActive(true);
         string output = "\n";
         for (int i = 0; i < _playerInfo.Count; i++) {
             output += _playerInfo[i].NamePlayer.text + " | " + _playerInfo[i].ColorChip.color + " | " +
