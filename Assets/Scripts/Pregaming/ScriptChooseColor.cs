@@ -8,6 +8,7 @@ public class ScriptChooseColor : MonoBehaviour, IPointerClickHandler {
     [SerializeField] private Image imageToShow;
     [SerializeField] private TMP_InputField nameInputField;
     [SerializeField] private Button save;
+    [SerializeField] private Button close;
 
     private PlayerInfo _objectToEdit;
     public static ScriptChooseColor Instance { get; private set; }     
@@ -25,6 +26,7 @@ public class ScriptChooseColor : MonoBehaviour, IPointerClickHandler {
     private void Start() {
         nameInputField.characterLimit = Constants.MaxNameLength;
         save.onClick.AddListener(Save);
+        close.onClick.AddListener(CloseWindow);
     }
 
     public void OnPointerClick(PointerEventData eventData) {
@@ -53,6 +55,7 @@ public class ScriptChooseColor : MonoBehaviour, IPointerClickHandler {
         }
         _objectToEdit.ColorChip.color = imageToShow.color;
         _objectToEdit.NamePlayer.text = nameInputField.text;
+        close.gameObject.SetActive(true);
         gameObject.SetActive(false);
     }
 
@@ -65,6 +68,10 @@ public class ScriptChooseColor : MonoBehaviour, IPointerClickHandler {
             PlayerInfoManager.Instance.ShowError("Таке ім'я вже існує");
             return false;
         }
+        if (PlayerInfoManager.Instance.IsSimilarColorExist(imageToShow.color, _objectToEdit.transform.GetSiblingIndex())) {
+            PlayerInfoManager.Instance.ShowError("Схожий колір вже існує");
+            return false;
+        }
         return true;
     }
     
@@ -73,5 +80,12 @@ public class ScriptChooseColor : MonoBehaviour, IPointerClickHandler {
         gameObject.SetActive(true);
         imageToShow.color = changeInfo.ColorChip.color;
         nameInputField.text = changeInfo.NamePlayer.text;
+        if (nameInputField.text.Length == 0) {
+            close.gameObject.SetActive(false);
+        }
+    }
+
+    private void CloseWindow() {
+        gameObject.SetActive(false);
     }
 }

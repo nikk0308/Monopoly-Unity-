@@ -8,16 +8,6 @@ public class OutputPhrases : MonoBehaviour
     //__________________________________________________________________________________________________________________________________________
     // CARDS
 
-    public static readonly Dictionary<string, string[]> outputTextByTags = new () {
-        {"Bonus", new string[] {"БОНУС"} },
-        {"Zrada", new string[] { "ЗРАДА" }},
-        {"Work", new string[] { "РОБОТА" }},
-        {"Prison", new string[] {"ТЮРМА"}},
-        {"ExitChance", new string[] { "ШАНС", "ВИХОДУ" }},
-        {"Review", new string[] { "ОГЛЯД" }},
-        {"Start", new string[] { "СТАРТ" }}
-    };
-
     public static string[] TextToShowEnterprise(Enterprise enterprise) {
         return new[] {
             enterprise.title,
@@ -35,14 +25,17 @@ public class OutputPhrases : MonoBehaviour
     public static string TextNoGainOrTake(Player player) {
         return player.nameInGame + " нічого не отримує і не втрачає";
     }
-    public static string TextBuyEnterpriseOrNot(Player player, Enterprise enterprise) {
-        return player.nameInGame + " зараз може купити " + enterprise.title + " з індустрії " + enterprise.industry.industryName +
-                          " за " + enterprise.priceToBuy + " гривень\n" +
-                          "Потрібно зробити вибір:\n" +
-                          "  1. Придбати підприємство та отримувати з інших багато грошей\n" +
-                          "  2. Залишити підприємство на покупку іншим і потім платити їм\n";
-    }
 
+    public static string ZradaOrBonusMovedTo(Player player, bool isBonus) {
+        return "Внаслідок " + (isBonus ? "бонуса" : "зради") + " гравець " + player.nameInGame +
+               " переміщується на клітинку " + Constants.GetCardNameByPos(player.positionInField);
+    }
+    
+    public static string TextBuyEnterpriseOrNot(Player player, Enterprise enterprise) {
+        return player.nameInGame + " зараз може купити " + enterprise.title + " за " + enterprise.priceToBuy + " гривень\n" +
+                          "Придбаєте підприємство чи залишите його на покупку іншим гравцям?";
+    }
+    
     public static string TextPawnInBank(Enterprise enterprise) {
         return enterprise.title + " закладено у банк. " + enterprise.owner.nameInGame + " отримує " +
             enterprise.currentPriceOthersPay + " на свій рахунок\n";
@@ -78,8 +71,8 @@ public class OutputPhrases : MonoBehaviour
 
     public static string TextGoOutOrNot(Player player, bool isGoOut) {
         return player.nameInGame + " " + (isGoOut
-            ? "нарешті виходить з країни та зараз ходить"
-            : "не виходить з країни і йде далі по колу :(");
+            ? "нарешті виходить з країни та зараз ходить (^_^)"
+            : "не виходить з країни і йде далі по колу (>_<)");
     }
 
     public static string TextGuessIsGoOut(Player player) {
@@ -88,15 +81,13 @@ public class OutputPhrases : MonoBehaviour
 
     public static string TextGoToPrisonOrNot(Player player, bool isGoToPrison) {
         return player.nameInGame + " " + (isGoToPrison ?
-            "відкупляється від перевіряючих" : "не встигає сховати контрабанду та відправляється до тюрми :(");
+             "не встигає сховати контрабанду та відправляється до тюрми :(" : "відкупляється від перевіряючих");
     }
 
     public static string TextWorkChoice(Player player) {
         return "До завершення роботи " + player.nameInGame + " має відробити ще " +
                           player.turnsCanContinueWork + " " + TextDayEnding(player.turnsCanContinueWork) +
-                          ". \nГравець може відробити день на роботі або піти з неї. Потрібно зробити вибір:\n" +
-                          "  1. Провести ще день на нудній роботі\n" +
-                          "  2. Піти далі досліджувати простори країни\n";
+                          ". \nПотрібно вирішити: відробити ще день на роботі або піти з неї";
     }
 
     public static string TextStartWork(Player player, bool canWork) {
@@ -113,15 +104,13 @@ public class OutputPhrases : MonoBehaviour
             player.nameInGame + " покидає роботу та може зробити хід далі, назустріч мрії";
     }
 
-    public static string TextBossPayed(int salary) {
-        return "Гарна робота! Роботодавець заплатив " + salary + " гривень за день роботи";
+    public static string TextBossPayed(Player player, int salary) {
+        return "Гарна робота, " + player.nameInGame + "! Роботодавець заплатив " + salary + " гривень за день роботи";
     }
 
     public static string TextIsPayedForFreedom(int priceToPay) {
-        return "До вас підійшов охоронець та запропонував витягнути з тюрми за " + priceToPay + " гривень\n" +
-            "Зробіть вибір:\n" +
-            "  1. Дати хабар та вийти з тюрми\n" +
-            "  2. Зберегти гроші ті сидіти в тюрмі далі\n";
+        return "До вас підійшов охоронець та запропонував витягнути з тюрми за " + priceToPay + " гривень. Чи хочете ви " +
+               "вийти з тюрми раніше відведеного вам строку?";
     }
 
     public static string TextSendPlayerToPrison(Player player, int turnsToGoOut) {
@@ -135,7 +124,7 @@ public class OutputPhrases : MonoBehaviour
     public static string TextBuyFreedomOrNot(Player player, bool isBought) {
         return isBought ?
             player.nameInGame + " викупляє свободу!" :
-            "На жаль, грошей виявилося недостатньо";
+            "На жаль, грошей для викупу виявилося недостатньо";
     }
 
     public static string TextGoOutOfPrisonOrNot(Player player, bool isGoOut) {
@@ -145,47 +134,23 @@ public class OutputPhrases : MonoBehaviour
     }
 
     public static string MovedToStart(Player player) {
-        return player.nameInGame + " переміщується на поле " + outputTextByTags["Start"];
+        return player.nameInGame + " переміщується на поле " + Constants.GetCardNameByPos(null);
     }
-
-    //__________________________________________________________________________________________________________________________________________
-    // Menu
-
-    public static string TextMainMenu() {
-        return "Головне меню:\n" +
-                          "  1. Гра з комп'ютером\n" +
-                          "  2. Гра з друзями\n" +
-                          "  3. Налаштування\n" +
-                          "  4. Вихід з гри\n";
-    }
-
-    public static string TextGoodbye() {
-        return "Сподіваємось, ви гарно провели час! Бувайте!";
-    }
-
-
     //__________________________________________________________________________________________________________________________________________
     // GamePlay
 
     public static string PlayerMovedTo(Player player, Field field) {
-        return player.nameInGame + " переміщується на " + PrintCellTitleInAText(field.TakeCardByPlayerPos(player)) + "\n";
+        return player.nameInGame + " переміщується на " + PrintCellTitleInAText(field.TakeCardByPlayerPos(player.positionInField)) + "\n";
     }
 
     public static string TextStartTurn(Player player, Field field, int startMoney) {
-        return player.nameInGame + " випадає доля йти в країну " + field.countriesArray[player.positionInField.arrayIndex] +
+        return player.nameInGame + " випадає доля йти в країну " +
+               Constants.countryNamesByCountryNames[field.countriesArray[player.positionInField.arrayIndex]] +
                ". Видано стартові " + startMoney + " гривень на підняття економіки країни";
-    }
-
-    public static string TextRollDice(Player player) {
-        return player.nameInGame + ", натисніть Enter щоб підкинути кубик";
     }
     
     public static string TextPressEnterToGoNextPlayer() {
         return "Натисніть Enter щоб перейти до наступного гравця";
-    }
-
-    public static string TextDiceNumber(int number) {
-        return "Випадає число " + number + "!\n";
     }
 
     public static string TextGainSalary(Player player, int salaryAmount) {
@@ -201,14 +166,13 @@ public class OutputPhrases : MonoBehaviour
     public static string TextPlayerInfo(Player player, Field field) {
         return " зараз має " + player.moneyAmount + " гривень. " +
                               "Знаходиться у " + GetCountryNameByPlayer(field, player) +
-                              " на клітинці " + PrintCellTitleInAText(field.TakeCardByPlayerPos(player)) +
+                              " на клітинці " + PrintCellTitleInAText(field.TakeCardByPlayerPos(player.positionInField)) +
                               ". Його підприємства: ";
     }
 
     public static string TextYouMustPawnEnterprises() {
-        return "У вас не вистачає грошей для продовження гри. Ви маєте закласти у банк якісь зі своїх" +
-                          " підприємств і отримаєте стільки, скільки платять інші,\n" +
-                          "коли стають на них (зможете їх викупити згодом) або програєте";
+        return "У вас не вистачає грошей для продовження гри. Ви маєте закласти у банк або продати якісь зі своїх" +
+                          " підприємств або програєте";
     }
 
     public static string TextDebtAndEnter(Player player) {
@@ -283,8 +247,9 @@ public class OutputPhrases : MonoBehaviour
         new [] { nL(1, 0, 11), nL(0, 0, 0), nL(0, 0, 0), nL(0, 0, 0), nL(1, 0, 5), nL(0, 0, 0), nL(0, 0, 0), nL(0, 0, 0), nL(0, 0, 0), nL(0, 0, 0), nL(1, 1, 15) },
         new [] { nL(1, 0, 10), nL(1, 0, 9), nL(1, 0, 8), nL(1, 0, 7), nL(1, 0, 6), nL(1, 1, 20), nL(1, 1, 19), nL(1, 1, 18), nL(1, 1, 17), nL(1, 1, 16), nL(0, 0, 0) }
     };
-    public static readonly int cellHeight = (new Enterprise(0, 
-        new Industry(new List<Position>(), "", 0), "")).TextToPrintInAField.Length;
+
+    public static readonly int cellHeight = 0;
+    //(new Enterprise(0, new Industry(new List<Position>(), "", Color.black), "", null)).TextToPrintInAField.Length;
     public static readonly int maxCellWidth = 15;
 
     private static List<int> nL(params int[] nums) {
@@ -303,10 +268,10 @@ public class OutputPhrases : MonoBehaviour
         if (indexes[0] == 1) {
             string[] cardText = new string[1];
             if (indexes[1] == -1) {
-                cardText = field.startCell.TextToPrintInAField;
+                //cardText = field.startCell.TextToPrintInAField;
             }
             else {
-                cardText = field.fieldArrays[indexes[1]][indexes[2]].TextToPrintInAField;
+                //cardText = field.fieldArrays[indexes[1]][indexes[2]].TextToPrintInAField;
             }
             
             int emptyStrAboveAmount = (cellHeight - cardText.Length) / 2;
@@ -347,9 +312,8 @@ public class OutputPhrases : MonoBehaviour
     }
     
     public static string PrintCellTitleInAText(Card? card) {
-        return (card is Enterprise enterprise) ? 
-            (enterprise.title) : 
-            (MakeOneStringFromArray(card.TextToPrintInAField));
+        return (card is Enterprise enterprise) ? (enterprise.title) : "u";
+        //(MakeOneStringFromArray(card.TextToPrintInAField));
     }
 
     public static string GetCountryNameByPlayer(Field field, Player player) {
@@ -357,7 +321,7 @@ public class OutputPhrases : MonoBehaviour
         if (player.positionInField == null) {
             ans = "місці, де пролягає кордон двох країн";
         }
-        else if (player.positionInField.cellIndex > field.specialIndexesByCellNames["ExitChance"]) {
+        else if (player.positionInField.cellIndex > Field.specialIndexesByCellNames["ExitChance"]) {
             ans = "міжкраїнному просторі";
         }
         else {

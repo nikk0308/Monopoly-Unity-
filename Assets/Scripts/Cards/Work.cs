@@ -1,45 +1,70 @@
+using UnityEngine;
+
 public class Work : Card
 {
     private const int startWorkingTerm = 3;
     private const int lowerSalaryBoard = 30;
     private const int upperSalaryBoard = 150;
 
-    public override string[] TextToPrintInAField {
-        get { return OutputPhrases.outputTextByTags["Work"]; }
+    public override void DoActionIfArrived(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        StartWork(player, out isUnfinishedMethod, ref text1, ref text2);
     }
 
-    public override string DoActionIfArrived(Field field, Player player) {
-        return StartWork(player);
+    public override void DoActionIfStayed(Field field, Player player, out bool isNextMoveNeed, out bool isUnfinishedMethod, 
+        ref string text1, ref string text2) {
+        Working(player, out isNextMoveNeed, out isUnfinishedMethod, ref text1, ref text2);
+    }
+    public override void DoActionIfArrivedAndUnfinished(Field field, Player player, bool yesOrNo, ref string text1, ref string text2) {
     }
 
-    public override string DoActionIfStayed(Field field, Player player, out bool isNextMoveNeed) {
-        return Working(player, out isNextMoveNeed);
+    public override void DoActionIfStayedAndUnfinished(Field field, Player player, bool yesOrNo, out bool isNextMoveNeed, 
+        ref string text1, ref string text2) {
+        WorkingContinue(player, yesOrNo, out isNextMoveNeed, ref text1, ref text2);
     }
 
-    private string StartWork(Player player) {
+    private void StartWork(Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        isUnfinishedMethod = false;
+        string curStrShow;
         player.turnsCanContinueWork = startWorkingTerm - player.howManyTimesWorked;
 
         if (player.turnsCanContinueWork == 0) {
-            return OutputPhrases.TextStartWork(player, false);
+            curStrShow = OutputPhrases.TextStartWork(player, false);
+            GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
+            return;
         }
-        else {
-            return OutputPhrases.TextStartWork(player, true);
-        }
+        curStrShow = OutputPhrases.TextStartWork(player, true);
+        GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
     }
 
-    private string Working(Player player, out bool isNextMoveNeed) {
+    private void Working(Player player, out bool isNextMoveNeed, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        isUnfinishedMethod = false;
+        isNextMoveNeed = false;
+        string curStrShow;
         if (player.turnsCanContinueWork == 0) {
             isNextMoveNeed = true;
             if (player.howManyTimesWorked < startWorkingTerm) {
                 player.howManyTimesWorked++;
             }
 
-            return OutputPhrases.TextFinishWorking(player, true);
+            curStrShow = OutputPhrases.TextFinishWorking(player, true);
+            GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
+            return;
         }
+        
+        if (player.IsABot()) {
+            bool botChoice = player.StayOnWorkOrNotBot();
+            WorkingContinue(player, botChoice, out isNextMoveNeed, ref text1, ref text2);
+            return;
+        }
+        
+        isUnfinishedMethod = true;
+        curStrShow = OutputPhrases.TextWorkChoice(player);
+        GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
+    }
 
-        JustOutput.PrintText(OutputPhrases.TextWorkChoice(player));
-        string personChoice = player.StayOnWorkOrNot();
-        if (personChoice == "1") {
+    private void WorkingContinue(Player player, bool yesOrNo, out bool isNextMoveNeed, ref string text1, ref string text2) {
+        string curStrShow;
+        if (yesOrNo) {
             isNextMoveNeed = false;
             player.turnsCanContinueWork--;
 
@@ -47,7 +72,10 @@ public class Work : Card
             randSalary /= 10;
             randSalary *= 10;
             player.moneyAmount += randSalary;
-            return OutputPhrases.TextBossPayed(randSalary);
+            
+            curStrShow = OutputPhrases.TextBossPayed(player, randSalary);
+            GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
+            return;
         }
 
         isNextMoveNeed = true;
@@ -56,6 +84,7 @@ public class Work : Card
             player.howManyTimesWorked++;
         }
 
-        return OutputPhrases.TextFinishWorking(player, false);
+        curStrShow = OutputPhrases.TextFinishWorking(player, false);
+        GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
     }
 }

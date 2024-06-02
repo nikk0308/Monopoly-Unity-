@@ -4,88 +4,242 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class GamePlay : MonoBehaviour
-{
-    public static GamePlay Instance { get; private set; }     
-    private Field field;
+public class GamePlay
+{   
     private readonly int indexOfEndOfCountry;
     private readonly int indexOfEndOfArray;
     private readonly int indexOfWorkCell;
     private readonly int enterOnArrayInAnother;
+    
+    private Field field;
+    private List<Player> players;
+    private List<bool> isPlayersAlive;
+    private int playersLeftAmount;
+    private int curPlayerIndex;
+    public bool isNextMoveNeed;
+    private Player curPlayer;
 
+    private bool isUnfinishedMethod;
+    private bool isStayedMethodPerformed;
 
-    public static readonly int salary = 100;
-    public static readonly int startCapital = 300;
+    private Position prePosition;
+    private Position postPosition;
+    private string messageToPrint;
+
+    private string messageToAdd;
+    private string textFromBlock1;
+    private string textFromBlock2;
+
+    public Field CurField => field;
+    public List<Player> Players => players;
+    public static GamePlay Instance { get; private set; }  
 
     public GamePlay() {
-        RecreateField();
-        indexOfEndOfCountry = field.specialIndexesByCellNames["ExitChance"];
-        indexOfEndOfArray = field.fieldArrays[0].Length - 1;
-        indexOfWorkCell = field.specialIndexesByCellNames["Work"];
+        indexOfEndOfCountry = Field.specialIndexesByCellNames["ExitChance"];
+        indexOfEndOfArray = Field.arrayLength - 1;
+        indexOfWorkCell = Field.specialIndexesByCellNames["Work"];
         enterOnArrayInAnother = indexOfWorkCell;
     }
 
-    public void RecreateField() {
-        field = new Field();
+    public static GamePlay GetInstance() {
+        if (Instance == null) {
+            Instance = new GamePlay();
+        }
+        return Instance;
     }
 
-    public void StartGame(Player[] players) {
-        bool isGameEnd = false;
-        List<Player> playersInGame = players.ToList();
-        int curIndexPlayerTurn = 0;
-        Player curPlayer;
-        bool isNextMoveNeed;
-        string messageToPrint;
+    public void StartGameUpdate(List<Player> playersList) {
+        RecreateField();
+        Instance.players = playersList;
+        playersLeftAmount = playersList.Count;
+        curPlayerIndex = 0;
+        curPlayer = playersList[curPlayerIndex];
+        isPlayersAlive = new();
+        for (int i = 0; i < playersLeftAmount; i++) {
+            isPlayersAlive.Add(true);
+        }
 
-        while (!isGameEnd) {
-            JustOutput.PrintAllField(field, playersInGame);
-            curPlayer = playersInGame[curIndexPlayerTurn];
-            PreTurnThings(curPlayer, playersInGame);
+        for (int i = 0; i < playersLeftAmount; i++) {
+            GameShowManager.Instance.MovePlayerToCurPos(i, playersList[i].positionInField,
+                playersList[i].positionInField);
+        }
 
-            messageToPrint = field.TakeCardByPlayerPos(curPlayer)
-                .DoActionIfStayed(field, curPlayer, out isNextMoveNeed);
-            JustOutput.PrintText(messageToPrint);
+        GameShowManager.Instance.UpdateCurrentTurnLabel(curPlayerIndex);
+        GameShowManager.Instance.SetButtonText(Constants.StartGameButtonText);
+        GameShowManager.Instance.LockDiceButton(false);
+        GameShowManager.Instance.LockPreTurnButtons(true);
+        GameShowManager.Instance.FieldToShow.ShowInfoBlock1(false);
+        GameShowManager.Instance.FieldToShow.ShowInfoBlock2(false);
+        GameShowManager.Instance.FieldToShow.ShowButtonsBlock2(false);
+        textFromBlock1 = "";
+        textFromBlock2 = "";
+    }
 
-            if (isNextMoveNeed) {
-                PlayerTurnWithDice(curPlayer);
-                JustOutput.PrintText(OutputPhrases.PlayerMovedTo(curPlayer, field));
-                messageToPrint = field.TakeCardByPlayerPos(curPlayer).DoActionIfArrived(field, curPlayer);
-                JustOutput.PrintText(messageToPrint);
-            }
+    private void RecreateField() {
+        Instance.field = new Field();
+    }
 
-            if (IsPlayerGoOut(curPlayer)) {
-                playersInGame.RemoveAt(curIndexPlayerTurn);
-                curIndexPlayerTurn--;
-                if (playersInGame.Count == 1) {
-                    isGameEnd = true;
-                    JustOutput.Congratulations(playersInGame[0], field);
-                }
-            }
+    public void MakeTurnIfStayed() {
+        isStayedMethodPerformed = true;
+        GameShowManager.Instance.FieldToShow.ShowInfoBlock1(false);
+        GameShowManager.Instance.FieldToShow.ShowInfoBlock2(false);
+        GameShowManager.Instance.LockDiceButton(true);
+        GameShowManager.Instance.LockPreTurnButtons(false);
+        textFromBlock1 = "";
+        textFromBlock2 = "";
+        GameShowManager.Instance.UpdateCurrentTurnLabel(curPlayerIndex);
+        if (curPlayer.IsABot()) {
+            GameShowManager.Instance.LockPreTurnButtons(true);
+            GameShowManager.Instance.UnPawnFromBank();
+            GameShowManager.Instance.BuildHome();
+        }
+        
+        players[curPlayerIndex].MakeTurnForPawnedEnter(field);
+        prePosition = Position.CreatePrePosition(curPlayer.positionInField);
+        field.TakeCardByPlayerPos(curPlayer.positionInField).DoActionIfStayed(field, curPlayer, out isNextMoveNeed, 
+            out isUnfinishedMethod, ref textFromBlock1, ref textFromBlock2);
+        postPosition = players[curPlayerIndex].positionInField;
+        GameShowManager.Instance.MovePlayerToCurPos(curPlayerIndex, prePosition, postPosition);
+        
+        GameShowManager.Instance.FieldToShow.ShowInfoBlock1(true);
+        GameShowManager.Instance.FieldToShow.ShowInfoBlock2(true);
+        GameShowManager.Instance.FieldToShow.SetTextInfo1(textFromBlock1);
+        GameShowManager.Instance.FieldToShow.SetTitleInfo2(Constants.GetCardNameByPos(prePosition));
+        GameShowManager.Instance.FieldToShow.SetTextInfo2(textFromBlock2);
 
-            curIndexPlayerTurn = (curIndexPlayerTurn + 1) % playersInGame.Count;
-
-            JustOutput.PrintText(OutputPhrases.TextPressEnterToGoNextPlayer());
-            Interactive.PressEnter();
+        GameShowManager.Instance.UpdateAllPlayersInfo(players, field);
+        if (!isUnfinishedMethod) {
+            MakeTurnIfStayedContinue(true);
+        }
+        else {
+            GameShowManager.Instance.FieldToShow.ShowButtonsBlock2(true);
         }
     }
 
-    private void PlayerTurnWithDice(Player player) {
+    public void MakeTurnIfStayedContinue(bool isYesTapped) {
+        if (isUnfinishedMethod) {
+            GameShowManager.Instance.FieldToShow.ShowButtonsBlock2(false);
+            field.TakeCardByPlayerPos(curPlayer.positionInField).DoActionIfStayedAndUnfinished(field, 
+                curPlayer, isYesTapped, out isNextMoveNeed, ref textFromBlock1, ref textFromBlock2);
+            GameShowManager.Instance.FieldToShow.SetTextInfo1(textFromBlock1);
+            GameShowManager.Instance.FieldToShow.SetTitleInfo2(Constants.GetCardNameByPos(prePosition));
+            GameShowManager.Instance.FieldToShow.SetTextInfo2(textFromBlock2);
+        }
+        GameShowManager.Instance.UpdateAllPlayersInfo(players, field);
+        
+        if (isNextMoveNeed) {
+            GameShowManager.Instance.SetButtonText(Constants.RollDiceButtonText);
+        }
+        else {
+            //GameShowManager.Instance.LockPreTurnButtons(true);
+            MoveToNextTurn();
+        }
+
+        GameShowManager.Instance.LockDiceButton(false);
+    }
+    public void MakeTurnAfterRollDice(int diceNum) {
+        isStayedMethodPerformed = false;
+        GameShowManager.Instance.FieldToShow.ShowInfoBlock1(false);
+        GameShowManager.Instance.FieldToShow.ShowInfoBlock2(false);
+        GameShowManager.Instance.LockDiceButton(true);
+        GameShowManager.Instance.LockPreTurnButtons(true);
+        
+        prePosition = Position.CreatePrePosition(curPlayer.positionInField);
+        TurnWithDice(curPlayer, diceNum);
+        
+        field.TakeCardByPlayerPos(curPlayer.positionInField).DoActionIfArrived(field, curPlayer, out isUnfinishedMethod, 
+            ref textFromBlock1, ref textFromBlock2);
+        postPosition = curPlayer.positionInField;
+        GameShowManager.Instance.MovePlayerToCurPos(curPlayerIndex, prePosition, postPosition);
+        
+        GameShowManager.Instance.FieldToShow.ShowInfoBlock1(true);
+        GameShowManager.Instance.FieldToShow.ShowInfoBlock2(true);
+        //messageToAdd = "Гравець " + players[curPlayerIndex].nameInGame + " прибув на карту " + Constants.FullSellNameByPos(postPosition, field);
+        //GameShowManager.Instance.FieldToShow.SetAdditionTextInfo1(messageToAdd);
+        GameShowManager.Instance.FieldToShow.SetTextInfo1(textFromBlock1);
+        GameShowManager.Instance.FieldToShow.SetTitleInfo2(Constants.GetCardNameByPos(postPosition));
+        GameShowManager.Instance.FieldToShow.SetTextInfo2(textFromBlock2);
+        
+        GameShowManager.Instance.UpdateAllPlayersInfo(players, field);
+        if (!isUnfinishedMethod) {
+            MakeTurnAfterRollDiceContinue(true);
+        }
+        else {
+            GameShowManager.Instance.FieldToShow.ShowButtonsBlock2(true);
+        }
+    }
+
+    public void MakeTurnAfterRollDiceContinue(bool isYesTapped) {
+        if (isUnfinishedMethod) {
+            GameShowManager.Instance.FieldToShow.ShowButtonsBlock2(false);
+            field.TakeCardByPlayerPos(curPlayer.positionInField).DoActionIfArrivedAndUnfinished(field, 
+                players[curPlayerIndex], isYesTapped, ref textFromBlock1, ref textFromBlock2);
+            GameShowManager.Instance.FieldToShow.SetTextInfo1(textFromBlock1);
+            GameShowManager.Instance.FieldToShow.SetTitleInfo2(Constants.GetCardNameByPos(postPosition));
+            GameShowManager.Instance.FieldToShow.SetTextInfo2(textFromBlock2);
+        }
+        GameShowManager.Instance.UpdateAllPlayersInfo(players, field);
+
+         if (IsPossibleBankrupt(curPlayer)) {
+             GameShowManager.Instance.SetButtonText(Constants.BankruptButtonText);
+             GameShowManager.Instance.LockDiceButton(false);
+             GameShowManager.Instance.LockPreTurnButtons(false);
+             if (!curPlayer.IsABot()) {
+                 PlayerInfoManager.Instance.ShowError("Баланс " + curPlayer.nameInGame + " опустився нижче нуля. Необхідно " +
+                                                      "погасити борг, заклавши підприємства, для продовження гри");
+             }
+             GameShowManager.Instance.PawnInBank();
+         }
+         else {
+             MoveToNextTurn();
+         }
+    }
+
+    public void MoveToNextTurn() {
+        curPlayerIndex = NextPlayerIndex();
+        curPlayer = players[curPlayerIndex];
+        GameShowManager.Instance.SetButtonText(Constants.NextTurnButtonText);
+        GameShowManager.Instance.LockDiceButton(false);
+    }
+
+    public void CurPlayerIsBankrupt() {
+        curPlayer.FreeAllEnterprises(field);
+        GameShowManager.Instance.RemovePlayerFromField(curPlayerIndex, curPlayer.positionInField);
+        //GameShowManager.Instance.UpdatePlayerInfo(curPlayer, field, curPlayerIndex);
+        GameShowManager.Instance.PlayerBankruptUpdate(curPlayerIndex);
+        isPlayersAlive[curPlayerIndex] = false;
+        playersLeftAmount--;
+        
+        if (playersLeftAmount == 1) {
+            curPlayerIndex = NextPlayerIndex();
+            curPlayer = players[curPlayerIndex];
+            GameShowManager.Instance.RemovePlayerFromField(curPlayerIndex, curPlayer.positionInField);
+            GameShowManager.Instance.GameEnded(curPlayer);
+        }
+        else {
+            PlayerInfoManager.Instance.ShowError("Гравець " + curPlayer.nameInGame + " тепер банкрот");
+            MoveToNextTurn();
+        }
+    }
+
+    public void ContinueAfterSelectedAns(bool isYes) {
+        if (isStayedMethodPerformed) {
+            MakeTurnIfStayedContinue(isYes);
+        }
+        else {
+            MakeTurnAfterRollDiceContinue(isYes);
+        }
+    }
+
+    private void TurnWithDice(Player player, int diceNum) {
         int curPlayerArr = player.positionInField.arrayIndex;
         int curPlayerCell = player.positionInField.cellIndex;
-
-        JustOutput.PrintText(OutputPhrases.TextRollDice(player));
-        if (!player.IsABot()) {
-            Interactive.PressEnter();
-        }
-
-        int randTurnsAmount = Constants.RollDice();
-        JustOutput.PrintText(OutputPhrases.TextDiceNumber(randTurnsAmount));
-
-        int newPlayerCell = curPlayerCell + randTurnsAmount;
+        int newPlayerCell = curPlayerCell + diceNum;
 
         if (curPlayerCell < indexOfWorkCell && newPlayerCell >= indexOfWorkCell) {
-            JustOutput.PrintText(OutputPhrases.TextGainSalary(player, salary));
-            player.moneyAmount += salary;
+            string strToShowInfo = OutputPhrases.TextGainSalary(player, Constants.Salary);
+            GameShowManager.Instance.FieldToShow.AutoAddText(ref textFromBlock1, ref textFromBlock2, strToShowInfo);
+            player.moneyAmount += Constants.Salary;
         }
 
         if (curPlayerCell == indexOfEndOfCountry) {
@@ -103,6 +257,63 @@ public class GamePlay : MonoBehaviour
                 player.positionInField.arrayIndex = curPlayerArr == 0 ? 1 : 0;
                 player.positionInField.cellIndex = newPlayerCell - indexOfEndOfArray - 1 + enterOnArrayInAnother;
             }
+        }
+    }
+
+    private int NextPlayerIndex() {
+        int i = curPlayerIndex;
+        bool isPlaying = false;
+        while (!isPlaying) {
+            i = (i + 1) % players.Count;
+            isPlaying = isPlayersAlive[i];
+        }
+        return i;
+    }
+
+    private bool IsPossibleBankrupt(Player player) {
+        return player.moneyAmount < 0;
+    }
+
+    public Player CurrentPlayer() {
+        return curPlayer;
+    }
+
+    /*public void StartGame(Player[] players) {
+        bool isGameEnd = false;
+        List<Player> playersInGame = players.ToList();
+        int curIndexPlayerTurn = 0;
+        Player curPlayer;
+        bool isNextMoveNeed;
+        string messageToPrint;
+
+        while (!isGameEnd) {
+            JustOutput.PrintAllField(field, playersInGame);
+            curPlayer = playersInGame[curIndexPlayerTurn];
+            PreTurnThings(curPlayer, playersInGame);
+
+            //messageToPrint = field.TakeCardByPlayerPos(curPlayer.positionInField).DoActionIfStayed(field, curPlayer, out isNextMoveNeed, out isUnfinishedMethod);
+            //JustOutput.PrintText(messageToPrint);
+
+            //if (isNextMoveNeed) {
+                //PlayerTurnWithDice(curPlayer);
+                JustOutput.PrintText(OutputPhrases.PlayerMovedTo(curPlayer, field));
+                //messageToPrint = field.TakeCardByPlayerPos(curPlayer.positionInField).DoActionIfArrived(field, curPlayer, out isUnfinishedMethod);
+                //JustOutput.PrintText(messageToPrint);
+            //}
+
+            if (IsPlayerGoOut(curPlayer)) {
+                playersInGame.RemoveAt(curIndexPlayerTurn);
+                curIndexPlayerTurn--;
+                if (playersInGame.Count == 1) {
+                    isGameEnd = true;
+                    JustOutput.Congratulations(playersInGame[0], field);
+                }
+            }
+
+            curIndexPlayerTurn = (curIndexPlayerTurn + 1) % playersInGame.Count;
+
+            JustOutput.PrintText(OutputPhrases.TextPressEnterToGoNextPlayer());
+            //Interactive.PressEnter();
         }
     }
 
@@ -218,36 +429,5 @@ public class GamePlay : MonoBehaviour
             }
         } while (isContinue);
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    private void Awake() 
-    {
-        if (Instance != null && Instance != this) {
-            Destroy(this);
-        }
-        else {
-            Instance = this;
-            DontDestroyOnLoad(this);
-        }
-    }
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    */
 }

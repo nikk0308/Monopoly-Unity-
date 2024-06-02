@@ -19,6 +19,12 @@ public class PlayerInfo : MonoBehaviour
     private void Start() {
         exit?.onClick.AddListener(() => PlayerInfoManager.Instance.DeletePlayerInfo(this));
         edit.onClick.AddListener(() => ScriptChooseColor.Instance.StartEditing(this));
+        if (botType != null) {
+            botType.options.Clear();
+            foreach (var type in Constants.botsNames) {
+                botType.options.Add(new TMP_Dropdown.OptionData(type));
+            }
+        }
     }
 }
 

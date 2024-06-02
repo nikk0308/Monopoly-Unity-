@@ -5,7 +5,7 @@ using System.IO;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Field : MonoBehaviour
+public class Field
 {
     public Card[][] fieldArrays;
     public Card startCell;
@@ -22,10 +22,10 @@ public class Field : MonoBehaviour
     // Inter. industries:  |    |    |     |    |     |    |     |    |    |      |    |    |    |      | 4 | 4 | 2 |      | 2 | 4 | 3 |
     // Start:              null
     private const int countriesAmount = 2;
-    private const int arrayLength = 21;
+    public const int arrayLength = 21;
     public const int enterOnArrayInAnother = 6;
 
-    private readonly Dictionary<int, string> specialCellNamesByIndexes = new Dictionary<int, string>() {
+    public static readonly Dictionary<int, string> specialCellNamesByIndexes = new() {
         { 2, "Bonus" },
         { 4, "Zrada" },
         { 6, "Work" },
@@ -34,7 +34,8 @@ public class Field : MonoBehaviour
         { 17, "Review" },
     };
 
-    public readonly Dictionary<string, int> specialIndexesByCellNames = new Dictionary<string, int>() {
+    public static readonly Dictionary<string, int> specialIndexesByCellNames = new() {
+        { "Start", -1},
         { "Bonus", 2 },
         { "Zrada", 4 },
         { "Work", 6 },
@@ -75,19 +76,21 @@ public class Field : MonoBehaviour
         industriesArray = new Industry[industriesArrLength];
 
         int curIndustryArrIndex = 0;
-        string startOfTextFiles = "../../../text_info";
+        string startOfTextFiles = "Assets/Resources/text_info";
         string nameOfCountryDir = startOfTextFiles + "/" + "enterprises_for_countries";
         string nameOfInterDir = startOfTextFiles + "/" + "enterprises_for_international";
 
         CountryIndustriesFill(nameOfCountryDir, ref curIndustryArrIndex);
         InternationalIndustriesFill(nameOfInterDir, ref curIndustryArrIndex);
         NonEnterprisesCardFill();
+
+        GameShowManager.Instance.FieldToShow.SetStartValues(this);
     }
 
-    public Card TakeCardByPlayerPos(Player player) {
-        return player.positionInField == null
+    public Card TakeCardByPlayerPos(Position position) {
+        return position == null
             ? startCell
-            : fieldArrays[player.positionInField.arrayIndex][player.positionInField.cellIndex];
+            : fieldArrays[position.arrayIndex][position.cellIndex];
     }
 
     private void NonEnterprisesCardFill() {
@@ -116,11 +119,11 @@ public class Field : MonoBehaviour
         for (int i = 0; i < countriesArray.Length; i++) {
             string countryFileName = countries[countryIndexesInFile[i]];
             countriesArray[i] = GetLastWordAfterSlashForDirectories(countryFileName);
-            string[] industries = Directory.GetFiles(countryFileName);
+            string[] industries = Directory.GetFiles(countryFileName, "*.txt");
 
             List<int> industriesIndexes =
                 ChooseNonRepeatableNums(0, industries.Length, countryIndustriesIndexes.Length);
-            List<int> arraysIndexesToFill = new List<int>() { i };
+            List<int> arraysIndexesToFill = new() { i };
 
             FillIndustriesInField(industriesIndexes, countryIndustriesIndexes, arraysIndexesToFill,
                 ref curIndustryArrIndex, industries);
@@ -134,7 +137,7 @@ public class Field : MonoBehaviour
         List<int> industriesList = new List<int>();
         List<int> arraysIndexesToFill;
 
-        string[] industries = Directory.GetFiles(industriesDirs[1]);
+        string[] industries = Directory.GetFiles(industriesDirs[1], "*.txt");
         industriesNeeded = 2 * privateIndustriesForEach.Length;
         internationalIndustriesIndexes = ChooseNonRepeatableNums(0, industries.Length, industriesNeeded);
         for (int i = 0; i < fieldArrays.Length; i++) {
@@ -148,7 +151,7 @@ public class Field : MonoBehaviour
             industriesList.Clear();
         }
 
-        industries = Directory.GetFiles(industriesDirs[0]);
+        industries = Directory.GetFiles(industriesDirs[0], "*.txt");
         industriesNeeded = commonIndustriesForEachTwoEnters.Length;
         internationalIndustriesIndexes = ChooseNonRepeatableNums(0, industries.Length, industriesNeeded);
         arraysIndexesToFill = new List<int>();
@@ -162,12 +165,11 @@ public class Field : MonoBehaviour
         }
 
         FillIndustriesInField(industriesList, commonIndustriesForEachTwoEnters, arraysIndexesToFill,
-            ref curIndustryArrIndex,
-            industries);
+            ref curIndustryArrIndex, industries);
         industriesList.Clear();
 
 
-        industries = Directory.GetFiles(industriesDirs[2]);
+        industries = Directory.GetFiles(industriesDirs[2], "*.txt");
         industriesNeeded = commonIndustriesForEachFourEnters.Length;
         internationalIndustriesIndexes = ChooseNonRepeatableNums(0, industries.Length, industriesNeeded);
         arraysIndexesToFill = new List<int>();
@@ -181,8 +183,7 @@ public class Field : MonoBehaviour
         }
 
         FillIndustriesInField(industriesList, commonIndustriesForEachFourEnters, arraysIndexesToFill,
-            ref curIndustryArrIndex,
-            industries);
+            ref curIndustryArrIndex, industries);
     }
 
     private void FillIndustriesInField(List<int> industriesIndexes, int[][] enterprisesIndexesInField,
@@ -212,8 +213,8 @@ public class Field : MonoBehaviour
                     curPrice = curPrice / 10 * 10;
 
                     fieldArrays[arraysIndexesToFill[j]][enterprisesIndexesInField[i][k]] = new Enterprise(curPrice,
-                        industriesArray[curIndustryIndexInGeneralArray],
-                        curIndustryFile[enterpriseIndexesInFile[j * enterprisesAmount + k]]);
+                        industriesArray[curIndustryIndexInGeneralArray], curIndustryFile[enterpriseIndexesInFile[j * enterprisesAmount + k]],
+                        new Position(arraysIndexesToFill[j], enterprisesIndexesInField[i][k]));
 
                     curIndustry.Add(new Position(arraysIndexesToFill[j], enterprisesIndexesInField[i][k]));
                 }
@@ -252,24 +253,13 @@ public class Field : MonoBehaviour
         return ans;
     }
 
-    private ConsoleColor UniqueColorForIndustry(int indexCurIndustry) {
-        ConsoleColor color;
+    private Color UniqueColorForIndustry(int indexCurIndustry) {
+        Color color;
         bool isUnique;
 
         do {
-            color = (ConsoleColor)(Constants.Rand.Next(0, 16));
+            color = Constants.RandColor();
             isUnique = true;
-
-            foreach (var badColor in JustOutput.notGoodColorsForEnterprises) {
-                if (color == badColor) {
-                    isUnique = false;
-                    break;
-                }
-            }
-
-            if (!isUnique) {
-                continue;
-            }
 
             for (int i = 0; i < indexCurIndustry; i++) {
                 if (color == industriesArray[i].color) {

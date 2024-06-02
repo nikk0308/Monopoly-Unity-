@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Industry : MonoBehaviour
+public class Industry
 {
     public List<Position> enterprisesIndexes;
     public string industryName;
-    public ConsoleColor color;
+    public Color color;
 
-    public Industry(List<Position> enterprisesIndexes, string industryName, ConsoleColor color) {
+    public Industry(List<Position> enterprisesIndexes, string industryName, Color color) {
         this.color = color;
         this.enterprisesIndexes = enterprisesIndexes;
         this.industryName = industryName;

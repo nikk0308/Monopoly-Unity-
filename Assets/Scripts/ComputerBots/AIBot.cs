@@ -4,15 +4,10 @@ using UnityEngine;
 
 public interface AIBot
 {
-    public string BotBuyEnterpriseOrNot(Player player, Enterprise enterprise);
-    public string BotPayToGoOutOfPrisonOrNot(Player player);
-    public string BotStayOnWorkOrNot(Player player);
-    public int BotWhichEnterprisePawnToNotLose(Player player, List<Enterprise> enterprises);
-
-    public string BotPawnEnterpriseOrBuildHotelPreTurn(Player player, List<Enterprise> notPawnedEnterprises,
-        List<Enterprise> pawnedEnterprises, List<Enterprise> enterprisesToBuildHotel);
-
-    public int BotWhichEnterprisePawnPreTurn(Player player, List<Enterprise> notPawnedEnterprises);
-    public int BotWhichEnterpriseUnPawnPreTurn(Player player, List<Enterprise> pawnedEnterprises);
-    public int BotWhichEnterpriseBuildHotelPreTurn(Player player, List<Enterprise> enterprisesToBuildHotel);
+    public bool BotBuyEnterpriseOrNot(Player player, Enterprise enterprise);
+    public bool BotPayToGoOutOfPrisonOrNot(Player player);
+    public bool BotStayOnWorkOrNot(Player player);
+    public int BotWhichEnterprisePawn(Player player, List<Enterprise> enterprises);
+    public int BotWhichEnterpriseUnPawn(Player player, List<Enterprise> pawnedEnterprises, int playerMoneyLeft);
+    public int BotWhichEnterpriseBuildHotel(Player player, List<Enterprise> enterprisesToBuildHotel, int playerMoneyLeft);
 }

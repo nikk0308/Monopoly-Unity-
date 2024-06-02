@@ -1,27 +1,41 @@
+using UnityEngine;
+
 public class Review : Card
 {
-    public override string[] TextToPrintInAField {
-        get { return OutputPhrases.outputTextByTags["Review"]; }
+
+    public override void DoActionIfArrived(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        GoToPrisonOrNot(field, player, out isUnfinishedMethod, ref text1, ref text2);
     }
 
-    public override string DoActionIfArrived(Field field, Player player) {
-        return GoToPrisonOrNot(field, player);
+    public override void DoActionIfStayed(Field field, Player player, out bool isNextMoveNeed, out bool isUnfinishedMethod, 
+        ref string text1, ref string text2) {
+        JustTurn(player, out isNextMoveNeed, out isUnfinishedMethod, ref text1, ref text2);
+    }
+    public override void DoActionIfArrivedAndUnfinished(Field field, Player player, bool yesOrNo, ref string text1, ref string text2) {
     }
 
-    public override string DoActionIfStayed(Field field, Player player, out bool isNextMoveNeed) {
-        return JustTurn(player, out isNextMoveNeed);
+    public override void DoActionIfStayedAndUnfinished(Field field, Player player, bool yesOrNo, out bool isNextMoveNeed, 
+        ref string text1, ref string text2) {
+        isNextMoveNeed = false;
     }
 
-    private string GoToPrisonOrNot(Field field, Player player) {
+    private void GoToPrisonOrNot(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        isUnfinishedMethod = false;
+        string curStrShow;
         bool isGoToPrison = Constants.RollCoin(20, 80);
 
         if (!isGoToPrison) {
-            return OutputPhrases.TextGoToPrisonOrNot(player, isGoToPrison);
+            curStrShow = OutputPhrases.TextGoToPrisonOrNot(player, isGoToPrison);
+            GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
+            return;
         }
 
-        int prisonIndex = field.specialIndexesByCellNames["Prison"];
+        int prisonIndex = Field.specialIndexesByCellNames["Prison"];
         player.positionInField.cellIndex = prisonIndex;
-        field.fieldArrays[player.positionInField.arrayIndex][prisonIndex].DoActionIfArrived(field, player);
-        return OutputPhrases.TextGoToPrisonOrNot(player, isGoToPrison);
+        curStrShow = OutputPhrases.TextGoToPrisonOrNot(player, isGoToPrison);
+        GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
+        
+        field.fieldArrays[player.positionInField.arrayIndex][prisonIndex]
+            .DoActionIfArrived(field, player, out isUnfinishedMethod, ref text1, ref text2);
     }
 }

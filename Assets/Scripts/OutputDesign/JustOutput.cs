@@ -11,31 +11,12 @@ public class JustOutput : MonoBehaviour
     public static readonly int maxSymbolsInOneCell = 15;
     public static readonly int screenWidth = 186;
 
-    public static readonly List<ConsoleColor> notGoodColorsForEnterprises = new() {
-        ConsoleColor.Black,
-        ConsoleColor.DarkGray,
-        ConsoleColor.Gray
-    };
-
-    public static readonly List<ConsoleColor> notGoodColorsForPlayers = new() {
-        ConsoleColor.Black,
-        ConsoleColor.Gray,
-        ConsoleColor.White,
-        ConsoleColor.DarkGray,
-        ConsoleColor.DarkBlue,
-        ConsoleColor.DarkGreen,
-        ConsoleColor.DarkYellow,
-        ConsoleColor.DarkRed,
-        ConsoleColor.DarkMagenta,
-        ConsoleColor.DarkCyan,
-    };
-
     public static void PrintAListOfEnterprisesInOneLine(List<Enterprise> enterprises) {
         string[][] enterprisesInLines = new string[enterprises.Count][];
         int curBoard;
 
         for (int i = 0; i < enterprisesInLines.Length; i++) {
-            enterprisesInLines[i] = enterprises[i].TextToPrintInAField;
+            //enterprisesInLines[i] = enterprises[i].TextToPrintInAField;
         }
 
         for (int i = 0; i < enterprisesInLines.Length; i += maxCellsInOneLine) {
@@ -75,7 +56,7 @@ public class JustOutput : MonoBehaviour
         Console.WriteLine();
         foreach (var player in playersInGame) {
             ConsoleColor fore = Console.ForegroundColor;
-            Console.ForegroundColor = player.chipColor;
+            //Console.ForegroundColor = player.chipColor;
             Console.Write(player.nameInGame);
             Console.ForegroundColor = fore;
             Console.WriteLine(OutputPhrases.TextPlayerInfo(player, field));
@@ -208,7 +189,7 @@ public class JustOutput : MonoBehaviour
             if (stringIndex == 0) {
                 ConsoleColor backColor = Console.BackgroundColor;
                 ConsoleColor foreColor = Console.ForegroundColor;
-                Console.BackgroundColor = enterprise.industry.color;
+                //Console.BackgroundColor = enterprise.industry.color;
                 Console.ForegroundColor = ConsoleColor.Black;
                 Console.Write(stringText[stringIndex]);
                 Console.BackgroundColor = backColor;
@@ -218,7 +199,7 @@ public class JustOutput : MonoBehaviour
 
             if (stringIndex == 3 && enterprise.owner != null) {
                 ConsoleColor foreColor = Console.ForegroundColor;
-                Console.ForegroundColor = enterprise.owner.chipColor;
+                //Console.ForegroundColor = enterprise.owner.chipColor;
                 Console.Write(stringText[stringIndex]);
                 Console.ForegroundColor = foreColor;
                 return;
@@ -294,7 +275,7 @@ public class JustOutput : MonoBehaviour
                 Console.Write(new string('_', betweenSpace));
             }
 
-            Console.BackgroundColor = player.chipColor;
+            //Console.BackgroundColor = player.chipColor;
             Console.Write(new string('_', chipWidth));
             Console.BackgroundColor = back;
             isFirst = false;

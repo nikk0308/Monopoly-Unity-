@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -28,7 +29,6 @@ public class PlayerInfoManager : MonoBehaviour
     private List<PlayerInfo> _playerInfo = new();
     private List<string> _defaultNames = new();
 
-    public List<PlayerInfo> PlayerInform => _playerInfo;
     public static PlayerInfoManager Instance { get; private set; }     
     private void Awake() 
     {
@@ -69,21 +69,37 @@ public class PlayerInfoManager : MonoBehaviour
     private void CreatePlayer() {
         var playerInfo = Instantiate(objectPlayerInfo, parent);
         SetDefaultPlayerValue(playerInfo);
+        ClearPlayerColorAndName(playerInfo);
+        ScriptChooseColor.Instance.StartEditing(playerInfo);
     }
     
     public void CreateOwner() {
         var ownerInfo = Instantiate(objectOwnerInfo, parent);
         SetDefaultPlayerValue(ownerInfo);
-        ownerInfo.NamePlayer.text = "Грак";
+        ClearPlayerColorAndName(ownerInfo);
+        ScriptChooseColor.Instance.StartEditing(ownerInfo);
     }
 
     private void SetDefaultPlayerValue(PlayerInfo newPlayer) {
-        newPlayer.ColorChip.color = new Color(1f, 1f, 1f);
+        newPlayer.ColorChip.color = RandUniqueColor();
         newPlayer.NamePlayer.text = RandUniqueName();
         _playerInfo.Add(newPlayer);
         if (_playerInfo.Count >= Constants.MaxPlayersAmount) {
             create.enabled = false;
         }
+    }
+
+    private void ClearPlayerColorAndName(PlayerInfo player) {
+        player.ColorChip.color = Color.white;
+        player.NamePlayer.text = "";
+    }
+
+    private Color RandUniqueColor() {
+        Color colorToReturn;
+        do {
+            colorToReturn = Constants.RandColor();
+        } while (IsSimilarColorExist(colorToReturn));
+        return colorToReturn;
     }
 
     private void CloseWindow() {
@@ -109,14 +125,8 @@ public class PlayerInfoManager : MonoBehaviour
             ShowError("Недостатня кількість гравців");
             return;
         }
-
-        playGameWindow.gameObject.SetActive(true);
-        string output = "\n";
-        for (int i = 0; i < _playerInfo.Count; i++) {
-            output += _playerInfo[i].NamePlayer.text + " | " + _playerInfo[i].ColorChip.color + " | " +
-                      (_playerInfo[i].BotType == null ? "немає" : Convert.ToString(_playerInfo[i].BotType.value)) + "\n";
-        }
-        Debug.Log(output);
+        CloseWindow();
+        GameShowManager.Instance.EnableWindow();
     }
 
     public void ShowError(string errorText) {
@@ -130,22 +140,40 @@ public class PlayerInfoManager : MonoBehaviour
                 return true;
             }
         }
-        foreach (var player in _playerInfo) {
+        return false;
+    }
+    
+    public bool IsSimilarColorExist(Color playerColor, int nameIndex = -1) {
+        for (int i = 0; i < _playerInfo.Count; i++) {
+            if (EvklidColorDistance(playerColor, _playerInfo[i].ColorChip.color) < Constants.PlayersColorsSimilarityDegree
+                && nameIndex != i) {
+                return true;
+            }
         }
         return false;
     }
 
+    private double EvklidColorDistance(Color first, Color second) {
+        return Math.Sqrt(Math.Pow(first.r - second.r, 2) + Math.Pow(first.g - second.g, 2) + Math.Pow(first.b - second.b, 2));
+    }
+        
     private void CloseError() {
         errorWindow.gameObject.SetActive(false);
     }
     private void NamesFill() {
-        var fileNames = Resources.Load<TextAsset>("text_info/names_for_bots/normal_names").ToString();
-        int startIndex = 0;
-        int findIndex = fileNames.IndexOf('\n', startIndex);
-        while (findIndex != -1) {
-            _defaultNames.Add(fileNames.Substring(startIndex, findIndex - startIndex));
-            startIndex = findIndex + 1;
-            findIndex = fileNames.IndexOf('\n', startIndex);
+        // var fileNames = Resources.Load<TextAsset>("text_info/names_for_bots/normal_names").ToString();
+        // int startIndex = 0;
+        // int findIndex = fileNames.IndexOf('\n', startIndex);
+        // while (findIndex != -1) {
+        //     _defaultNames.Add(fileNames.Substring(startIndex, findIndex - startIndex));
+        //     startIndex = findIndex + 1;
+        //     findIndex = fileNames.IndexOf('\n', startIndex);
+        // }
+        
+        string fileLocation = "Assets/Resources/text_info/names_for_bots/normal_names.txt";
+        string[] names = File.ReadAllLines(fileLocation);
+        foreach (var name in names) {
+            _defaultNames.Add(name);
         }
     }
 

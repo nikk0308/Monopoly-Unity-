@@ -5,58 +5,36 @@ using UnityEngine;
 
 public class AlwaysAgreeIfCanBot : AIBot
 {
-    public string BotBuyEnterpriseOrNot(Player player, Enterprise enterprise) {
-        string choice = "1";
-        JustOutput.PrintText(choice);
-        return choice;
+    public bool BotBuyEnterpriseOrNot(Player player, Enterprise enterprise) {
+        return true;
     }
 
-    public string BotPayToGoOutOfPrisonOrNot(Player player) {
-        string choice = "1";
-        JustOutput.PrintText(choice);
-        return choice;
+    public bool BotPayToGoOutOfPrisonOrNot(Player player) {
+        return true;
     }
 
-    public string BotStayOnWorkOrNot(Player player) {
-        string choice = "2";
-        JustOutput.PrintText(choice);
-        return choice;
+    public bool BotStayOnWorkOrNot(Player player) {
+        return true;
     }
 
-    public int BotWhichEnterprisePawnToNotLose(Player player, List<Enterprise> enterprises) {
-        int choice = 1;
-        JustOutput.PrintText(Convert.ToString(choice));
-        return choice;
-    }
-
-    public string BotPawnEnterpriseOrBuildHotelPreTurn(Player player, List<Enterprise> notPawnedEnterprises,
-        List<Enterprise> pawnedEnterprises, List<Enterprise> enterprisesToBuildHotel) {
-        string choice;
-        if (pawnedEnterprises.Count == 0) {
-            choice = "0";
+    public int BotWhichEnterprisePawn(Player player, List<Enterprise> notPawnedEnterprises) {
+        if (notPawnedEnterprises.Count == 0) {
+            return -1;
         }
-        else {
-            choice = "2";
-        }
-        JustOutput.PrintText(choice);
-        return choice;
-    }
-
-    public int BotWhichEnterprisePawnPreTurn(Player player, List<Enterprise> notPawnedEnterprises) { // Will be never used
-        int choice = 1;
-        JustOutput.PrintText(Convert.ToString(choice));
-        return choice;
+        return 0;
     }
     
-    public int BotWhichEnterpriseUnPawnPreTurn(Player player, List<Enterprise> pawnedEnterprises) {
-        int choice = 1;
-        JustOutput.PrintText(Convert.ToString(choice));
-        return choice;
+    public int BotWhichEnterpriseUnPawn(Player player, List<Enterprise> pawnedEnterprises, int playerMoneyLeft) {
+        if (pawnedEnterprises.Count == 0 || pawnedEnterprises[0].priceToBuy > playerMoneyLeft) {
+            return -1;
+        }
+        return 0;
     }
 
-    public int BotWhichEnterpriseBuildHotelPreTurn(Player player, List<Enterprise> enterprisesToBuildHotel) { // Will be never used
-        int choice = 1;
-        JustOutput.PrintText(Convert.ToString(choice));
-        return choice;
+    public int BotWhichEnterpriseBuildHotel(Player player, List<Enterprise> enterprisesToBuildHotel, int playerMoneyLeft) {
+        if (enterprisesToBuildHotel.Count == 0 || enterprisesToBuildHotel[0].priceToBuildHotel > playerMoneyLeft) {
+            return -1;
+        }
+        return 0;
     }
 }

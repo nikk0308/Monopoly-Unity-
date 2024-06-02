@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Position : MonoBehaviour
+public class Position
 {
     public int arrayIndex;
     public int cellIndex;
@@ -10,5 +10,13 @@ public class Position : MonoBehaviour
     public Position(int arrayIndex = 0, int cellIndex = 0) {
         this.arrayIndex = arrayIndex;
         this.cellIndex = cellIndex;
+    }
+
+    public static Position CreatePrePosition(Position position) {
+        if (position == null) {
+            return null;
+        }
+
+        return new Position(position.arrayIndex, position.cellIndex);
     }
 }

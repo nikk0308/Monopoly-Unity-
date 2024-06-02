@@ -1,18 +1,26 @@
+using UnityEngine;
+
 public class ExitChance : Card
 {
-    public override string[] TextToPrintInAField {
-        get { return OutputPhrases.outputTextByTags["ExitChance"]; } 
-    }
-    public override string DoActionIfArrived(Field field, Player player) {
-        return GuessIsGoOut(player);
+    public override void DoActionIfArrived(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        GuessIsGoOut(player, out isUnfinishedMethod, ref text1, ref text2);
     }
 
-    public override string DoActionIfStayed(Field field, Player player, out bool isNextMoveNeed) {
-        return GoOutOrNot(player, out isNextMoveNeed);
+    public override void DoActionIfStayed(Field field, Player player, out bool isNextMoveNeed, out bool isUnfinishedMethod, 
+        ref string text1, ref string text2) {
+        GoOutOrNot(player, out isNextMoveNeed, out isUnfinishedMethod, ref text1, ref text2);
+    }
+    public override void DoActionIfArrivedAndUnfinished(Field field, Player player, bool yesOrNo, ref string text1, ref string text2) {
     }
 
-    private string GoOutOrNot(Player player, out bool isNextMoveNeed) {
+    public override void DoActionIfStayedAndUnfinished(Field field, Player player, bool yesOrNo, out bool isNextMoveNeed, 
+        ref string text1, ref string text2) {
+        isNextMoveNeed = false;
+    }
+
+    private void GoOutOrNot(Player player, out bool isNextMoveNeed, out bool isUnfinishedMethod, ref string text1, ref string text2) {
         isNextMoveNeed = true;
+        isUnfinishedMethod = false;
         bool isGoOut = player.canGoOutOfCountry;
 
         if (!player.canGoOutOfCountry) {
@@ -20,12 +28,16 @@ public class ExitChance : Card
         }
         player.canGoOutOfCountry = false;
         
-        return OutputPhrases.TextGoOutOrNot(player, isGoOut);
+        string curStrShow = OutputPhrases.TextGoOutOrNot(player, isGoOut);
+        GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
     }
 
-    private string GuessIsGoOut(Player player) {
+    private void GuessIsGoOut(Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        isUnfinishedMethod = false;
         bool isGoOut = Constants.RollCoin(80, 20);
         player.canGoOutOfCountry = isGoOut;
-        return OutputPhrases.TextGuessIsGoOut(player);
+        
+        string curStrShow = OutputPhrases.TextGuessIsGoOut(player);
+        GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
     }
 }

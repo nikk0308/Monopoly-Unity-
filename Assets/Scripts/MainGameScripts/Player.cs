@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player
 {
     internal readonly string nameInGame;
-    internal readonly ConsoleColor chipColor;
+    internal readonly Color chipColor;
     internal int moneyAmount;
     internal Position? positionInField;
     internal int turnsToGoOutOfPrison;
@@ -16,7 +17,7 @@ public class Player : MonoBehaviour
     internal int howManyTimesWorked;
     private AIBot? playerAI;
 
-    public Player(string nameInGame, AIBot? playerAI, ConsoleColor chipColor, int moneyAmount = 0,
+    public Player(string nameInGame, AIBot? playerAI, Color chipColor, int moneyAmount = 0,
         Position? positionInField = null, int turnsToGoOutOfPrison = 0, int howManyTimesPayedInPrison = 0,
         bool canGoOutOfCountry = false, int turnsCanContinueWork = 0, int howManyTimesWorked = 0) {
         this.nameInGame = nameInGame;
@@ -96,89 +97,28 @@ public class Player : MonoBehaviour
     }
 
 
-    public string BuyEnterpriseOrNot(Enterprise enterprise) {
-        if (IsABot()) {
-            JustOutput.PrintMyChoice();
-        }
-
-        return !IsABot()
-            ? Interactive.GetPersonChoice(new List<string> { "1", "2" })
-            : playerAI.BotBuyEnterpriseOrNot(this, enterprise);
+    public bool BuyEnterpriseOrNotBot(Enterprise enterprise) {
+        return playerAI.BotBuyEnterpriseOrNot(this, enterprise);
     }
 
-    public string PayToGoOutOfPrisonOrNot() {
-        if (IsABot()) {
-            JustOutput.PrintMyChoice();
-        }
-
-        return !IsABot()
-            ? Interactive.GetPersonChoice(new List<string>() { "1", "2" })
-            : playerAI.BotPayToGoOutOfPrisonOrNot(this);
+    public bool PayToGoOutOfPrisonOrNotBot() {
+        return playerAI.BotPayToGoOutOfPrisonOrNot(this);
     }
 
-    public string StayOnWorkOrNot() {
-        if (IsABot()) {
-            JustOutput.PrintMyChoice();
-        }
-
-        return !IsABot()
-            ? Interactive.GetPersonChoice(new List<string>() { "1", "2" })
-            : playerAI.BotStayOnWorkOrNot(this);
+    public bool StayOnWorkOrNotBot() {
+        return playerAI.BotStayOnWorkOrNot(this);
     }
 
-    public int WhichEnterprisePawnToNotLose(List<Enterprise> enterprises) {
-        if (IsABot()) {
-            JustOutput.PrintMyChoice();
-        }
-
-        return !IsABot()
-            ? Convert.ToInt32(Interactive.GetPersonChoice(JustOutput.MakeAListFromDiapasone(1, enterprises.Count))) - 1
-            : playerAI.BotWhichEnterprisePawnToNotLose(this, enterprises);
+    public int WhichEnterprisePawnBot(List<Enterprise> enterprises) {
+        return playerAI.BotWhichEnterprisePawn(this, enterprises);
     }
 
-    public string PawnEnterpriseOrBuildHotelPreTurn(List<Enterprise> notPawnedEnterprises,
-        List<Enterprise> pawnedEnterprises, List<Enterprise> enterprisesToBuildHotel) {
-        if (IsABot()) {
-            JustOutput.PrintMyChoice();
-        }
-
-        return !IsABot()
-            ? Interactive.GetPersonChoice(JustOutput.MakeAListFromDiapasone(0, 3))
-            : playerAI.BotPawnEnterpriseOrBuildHotelPreTurn(this, notPawnedEnterprises, pawnedEnterprises,
-                enterprisesToBuildHotel);
+    public int WhichEnterpriseUnPawnBot(List<Enterprise> pawnedEnterprises, int playerMoneyLeft) {
+        return playerAI.BotWhichEnterpriseUnPawn(this, pawnedEnterprises, playerMoneyLeft);
     }
 
-    public int WhichEnterprisePawnPreTurn(List<Enterprise> notPawnedEnterprises) {
-        if (IsABot()) {
-            JustOutput.PrintMyChoice();
-        }
-
-        return !IsABot()
-            ? Convert.ToInt32(
-                Interactive.GetPersonChoice(JustOutput.MakeAListFromDiapasone(1, notPawnedEnterprises.Count))) - 1
-            : playerAI.BotWhichEnterprisePawnPreTurn(this, notPawnedEnterprises);
-    }
-
-    public int WhichEnterpriseUnPawnPreTurn(List<Enterprise> pawnedEnterprises) {
-        if (IsABot()) {
-            JustOutput.PrintMyChoice();
-        }
-
-        return !IsABot()
-            ? Convert.ToInt32(
-                Interactive.GetPersonChoice(JustOutput.MakeAListFromDiapasone(1, pawnedEnterprises.Count))) - 1
-            : playerAI.BotWhichEnterpriseUnPawnPreTurn(this, pawnedEnterprises);
-    }
-
-    public int WhichEnterpriseBuildHotelPreTurn(List<Enterprise> enterprisesToBuildHotel) {
-        if (IsABot()) {
-            JustOutput.PrintMyChoice();
-        }
-
-        return !IsABot()
-            ? Convert.ToInt32(
-                Interactive.GetPersonChoice(JustOutput.MakeAListFromDiapasone(1, enterprisesToBuildHotel.Count))) - 1
-            : playerAI.BotWhichEnterpriseBuildHotelPreTurn(this, enterprisesToBuildHotel);
+    public int WhichEnterpriseBuildHotelBot(List<Enterprise> enterprisesToBuildHotel, int playerMoneyLeft) {
+        return playerAI.BotWhichEnterpriseBuildHotel(this, enterprisesToBuildHotel, playerMoneyLeft);
     }
 
     public bool IsABot() {

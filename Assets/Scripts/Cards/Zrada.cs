@@ -1,24 +1,31 @@
+using UnityEngine;
+
 public class Zrada : Card
 {
-    private delegate string Action(Field field, Player player);
+    private delegate void Action(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2);
 
     private readonly int[] probability = { 35, 15, 10, 30, 10 };
 
-    public override string[] TextToPrintInAField {
-        get { return OutputPhrases.outputTextByTags["Zrada"]; }
+    public override void DoActionIfArrived(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        GivePlayerAZrada(field, player, out isUnfinishedMethod, ref text1, ref text2);
     }
 
-    public override string DoActionIfArrived(Field field, Player player) {
-        return GivePlayerAZrada(field, player);
+    public override void DoActionIfStayed(Field field, Player player, out bool isNextMoveNeed, out bool isUnfinishedMethod, 
+        ref string text1, ref string text2) {
+        JustTurn(player, out isNextMoveNeed, out isUnfinishedMethod, ref text1, ref text2);
     }
 
-    public override string DoActionIfStayed(Field field, Player player, out bool isNextMoveNeed) {
-        return JustTurn(player, out isNextMoveNeed);
+    public override void DoActionIfArrivedAndUnfinished(Field field, Player player, bool yesOrNo, ref string text1, ref string text2) {
+    }
+    public override void DoActionIfStayedAndUnfinished(Field field, Player player, bool yesOrNo, out bool isNextMoveNeed, 
+        ref string text1, ref string text2) {
+        isNextMoveNeed = false;
     }
 
-    private string GivePlayerAZrada(Field field, Player player) {
+    private void GivePlayerAZrada(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        isUnfinishedMethod = false;
         Action action = Choose();
-        return action(field, player);
+        action(field, player, out isUnfinishedMethod, ref text1, ref text2);
     }
 
     private Action Choose() {
@@ -42,31 +49,41 @@ public class Zrada : Card
         return curIndex;
     }
 
-    private string Take100FromAPlayer(Field field, Player player) {
+    private void Take100FromAPlayer(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        isUnfinishedMethod = false;
         int moneyToTake = 100;
         player.moneyAmount -= moneyToTake;
-        return OutputPhrases.TextBonusOrZradaMoneyAmount(player, moneyToTake, false);
+        string curStrShow = OutputPhrases.TextBonusOrZradaMoneyAmount(player, moneyToTake, false);
+        GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
     }
 
-    private string Take200FromAPlayer(Field field, Player player) {
+    private void Take200FromAPlayer(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        isUnfinishedMethod = false;
         int moneyToTake = 200;
         player.moneyAmount -= moneyToTake;
-        return OutputPhrases.TextBonusOrZradaMoneyAmount(player, moneyToTake, false);
+        string curStrShow = OutputPhrases.TextBonusOrZradaMoneyAmount(player, moneyToTake, false);
+        GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
     }
 
-    private string Take500FromAPlayer(Field field, Player player) {
+    private void Take500FromAPlayer(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        isUnfinishedMethod = false;
         int moneyToTake = 500;
         player.moneyAmount -= moneyToTake;
-        return OutputPhrases.TextBonusOrZradaMoneyAmount(player, moneyToTake, false);
+        string curStrShow = OutputPhrases.TextBonusOrZradaMoneyAmount(player, moneyToTake, false);
+        GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
     }
 
-    private string MovePlayerToPrison(Field field, Player player) {
-        int prisonIndex = field.specialIndexesByCellNames["Prison"];
+    private void MovePlayerToPrison(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        int prisonIndex = Field.specialIndexesByCellNames["Prison"];
         player.positionInField.cellIndex = prisonIndex;
-        return field.fieldArrays[player.positionInField.arrayIndex][prisonIndex].DoActionIfArrived(field, player);
+        string curStrShow = OutputPhrases.ZradaOrBonusMovedTo(player, false);
+        GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
+        field.fieldArrays[player.positionInField.arrayIndex][prisonIndex].DoActionIfArrived(field, player, out isUnfinishedMethod, ref text1, ref text2);
     }
 
-    private string Take0FromAPlayer(Field field, Player player) {
-        return OutputPhrases.TextNoGainOrTake(player);
+    private void Take0FromAPlayer(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
+        isUnfinishedMethod = false;
+        string curStrShow = OutputPhrases.TextNoGainOrTake(player);
+        GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
     }
 }
