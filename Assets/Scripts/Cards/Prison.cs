@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class Prison : Card
 {
     private const int startTurnsToGoOut = 3;

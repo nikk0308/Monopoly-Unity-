@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class Work : Card
 {
     private const int startWorkingTerm = 3;

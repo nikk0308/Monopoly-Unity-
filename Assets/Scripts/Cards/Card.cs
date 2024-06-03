@@ -1,4 +1,3 @@
-using UnityEngine;
 public abstract class Card
 {
     public abstract void DoActionIfArrived(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2);

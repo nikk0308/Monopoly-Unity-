@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class Enterprise : Card
 {
     public Player? owner;
@@ -41,8 +39,6 @@ public class Enterprise : Card
         priceOthersPayLevel2 = priceToBuy;
         priceOthersPayLevel3 = priceToBuy * 2;
         currentPriceOthersPay = 0;
-
-        UpdateTextToShow();
     }
 
     public override void DoActionIfArrived(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
@@ -64,7 +60,6 @@ public class Enterprise : Card
 
     public void PawnInBank(Field field) {
         //owner.moneyAmount += currentPriceOthersPay;
-        JustOutput.PrintText(OutputPhrases.TextPawnInBank(this));
         CollectOrDestroyIndustry(field, owner, false);
         currentPriceOthersPay = priceOthersPayLevel1;
         turnsToDisappearIfPawned = turnsInGeneralToDisappIfPawned;
@@ -73,7 +68,6 @@ public class Enterprise : Card
 
     public void UnPawnFromBank(Field field) {
         owner.moneyAmount -= priceToBuy;
-        JustOutput.PrintText(OutputPhrases.TextUnPawnFromBank(this));
         turnsToDisappearIfPawned = 0;
         CollectOrDestroyIndustry(field, owner, true);
         GetGraphicEnterprise().PawnEnterprise(false);
@@ -106,7 +100,6 @@ public class Enterprise : Card
         currentPriceOthersPay = priceOthersPayLevel3;
         owner.moneyAmount -= priceToBuildHotel;
         GetGraphicEnterprise().SetCurrentActivePrice(3);
-        JustOutput.PrintText(OutputPhrases.TextBuildHome(this));
     }
 
     private void PayBuyOrStay(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {
@@ -178,10 +171,6 @@ public class Enterprise : Card
         GameShowManager.Instance.FieldToShow.AutoAddText(ref text1, ref text2, curStrShow);
     }
 
-    private void UpdateTextToShow() {
-        textToShow = OutputPhrases.TextToShowEnterprise(this);
-    }
-
     private void BuyingCard(Field field, Player player) {
         player.moneyAmount -= priceToBuy;
         owner = player;
@@ -213,8 +202,6 @@ public class Enterprise : Card
         }
 
         if (isFullIndustryCur) {
-            JustOutput.PrintText(OutputPhrases.TextGainOrLostLocalMonopoly(player, this, isToCollect));
-
             foreach (var enterprise in industry.GetEnterprisesInIndustry(field)) {
                 if (isToCollect) {
                     enterprise.UpdateIfFullIndustry();

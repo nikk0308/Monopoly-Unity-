@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using Unity.VisualScripting;
+using System.Linq;
 using UnityEngine;
 
 public class Field
@@ -24,6 +22,7 @@ public class Field
     private const int countriesAmount = 2;
     public const int arrayLength = 21;
     public const int enterOnArrayInAnother = 6;
+    private const string foldersNameFile = "Folders";
 
     public static readonly Dictionary<int, string> specialCellNamesByIndexes = new() {
         { 2, "Bonus" },
@@ -76,7 +75,7 @@ public class Field
         industriesArray = new Industry[industriesArrLength];
 
         int curIndustryArrIndex = 0;
-        string startOfTextFiles = "Assets/Resources/text_info";
+        string startOfTextFiles = "text_info";
         string nameOfCountryDir = startOfTextFiles + "/" + "enterprises_for_countries";
         string nameOfInterDir = startOfTextFiles + "/" + "enterprises_for_international";
 
@@ -92,6 +91,7 @@ public class Field
             ? startCell
             : fieldArrays[position.arrayIndex][position.cellIndex];
     }
+
 
     private void NonEnterprisesCardFill() {
         foreach (var array in fieldArrays) {
@@ -112,14 +112,14 @@ public class Field
     }
 
     private void CountryIndustriesFill(string countryDirName, ref int curIndustryArrIndex) {
-        string[] countries = Directory.GetDirectories(countryDirName);
+        string[] countries = GetAllDirectories(countryDirName);
         List<int> countryIndexesInFile =
             ChooseNonRepeatableNums(0, countries.Length, fieldArrays.Length);
 
         for (int i = 0; i < countriesArray.Length; i++) {
             string countryFileName = countries[countryIndexesInFile[i]];
-            countriesArray[i] = GetLastWordAfterSlashForDirectories(countryFileName);
-            string[] industries = Directory.GetFiles(countryFileName, "*.txt");
+            countriesArray[i] = GetLastWordAfterSlash(countryFileName);
+            string[] industries = GetAllFilesInDir(countryFileName);
 
             List<int> industriesIndexes =
                 ChooseNonRepeatableNums(0, industries.Length, countryIndustriesIndexes.Length);
@@ -131,13 +131,13 @@ public class Field
     }
 
     private void InternationalIndustriesFill(string internDirName, ref int curIndustryArrIndex) {
-        string[] industriesDirs = Directory.GetDirectories(internDirName);
+        string[] industriesDirs = GetAllDirectories(internDirName);
         int industriesNeeded;
         List<int> internationalIndustriesIndexes;
         List<int> industriesList = new List<int>();
         List<int> arraysIndexesToFill;
 
-        string[] industries = Directory.GetFiles(industriesDirs[1], "*.txt");
+        string[] industries = GetAllFilesInDir(industriesDirs[1]);
         industriesNeeded = 2 * privateIndustriesForEach.Length;
         internationalIndustriesIndexes = ChooseNonRepeatableNums(0, industries.Length, industriesNeeded);
         for (int i = 0; i < fieldArrays.Length; i++) {
@@ -151,7 +151,7 @@ public class Field
             industriesList.Clear();
         }
 
-        industries = Directory.GetFiles(industriesDirs[0], "*.txt");
+        industries = GetAllFilesInDir(industriesDirs[0]);
         industriesNeeded = commonIndustriesForEachTwoEnters.Length;
         internationalIndustriesIndexes = ChooseNonRepeatableNums(0, industries.Length, industriesNeeded);
         arraysIndexesToFill = new List<int>();
@@ -169,7 +169,7 @@ public class Field
         industriesList.Clear();
 
 
-        industries = Directory.GetFiles(industriesDirs[2], "*.txt");
+        industries = GetAllFilesInDir(industriesDirs[2]);
         industriesNeeded = commonIndustriesForEachFourEnters.Length;
         internationalIndustriesIndexes = ChooseNonRepeatableNums(0, industries.Length, industriesNeeded);
         arraysIndexesToFill = new List<int>();
@@ -182,6 +182,7 @@ public class Field
             arraysIndexesToFill.Add(i);
         }
 
+
         FillIndustriesInField(industriesList, commonIndustriesForEachFourEnters, arraysIndexesToFill,
             ref curIndustryArrIndex, industries);
     }
@@ -190,8 +191,8 @@ public class Field
         List<int> arraysIndexesToFill, ref int curIndustryIndexInGeneralArray, string[] industries) {
         for (int i = 0; i < industriesIndexes.Count; i++) {
             string currentIndustryDir = industries[industriesIndexes[i]];
-            string currentIndustryName = GetLastWordAfterSlashForTxtFiles(currentIndustryDir);
-            string[] curIndustryFile = File.ReadAllLines(currentIndustryDir);
+            string currentIndustryName = GetLastWordAfterSlash(currentIndustryDir);
+            string[] curIndustryFile = ReadAllTextFileLines(currentIndustryDir);
             int arraysAmount = arraysIndexesToFill.Count;
 
             int enterprisesAmount = enterprisesIndexesInField[i].Length;
@@ -224,13 +225,8 @@ public class Field
         }
     }
 
-    private string GetLastWordAfterSlashForDirectories(string fileDirection) {
-        return fileDirection.Substring(fileDirection.LastIndexOf("\\") + 1);
-    }
-
-    private string GetLastWordAfterSlashForTxtFiles(string fileDirection) {
-        int lastIndexOfSlash = fileDirection.LastIndexOf("\\");
-        return fileDirection.Substring(lastIndexOfSlash + 1, fileDirection.LastIndexOf(".") - (lastIndexOfSlash + 1));
+    private string GetLastWordAfterSlash(string fileDirection) {
+        return fileDirection.Substring(fileDirection.LastIndexOf("/") + 1);
     }
 
     private List<int> ChooseNonRepeatableNums(int begin, int end, int amount) {
@@ -270,5 +266,43 @@ public class Field
         } while (!isUnique);
 
         return color;
+    }
+
+    private void CurTresh(string nameOfCountryDir, string foldersDir) {
+        TextAsset textAsset = Resources.Load<TextAsset>(foldersDir);
+        
+        string[] countries = textAsset.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        string countriesToPrint = "";
+        for (int i = 0; i < countries.Length; i++) {
+            countries[i] = nameOfCountryDir + "/" + countries[i];
+            countriesToPrint += countries[i] + "\n";
+        }
+    }
+
+    private string[] GetAllDirectories(string dirLocation) {
+        string foldersDir = dirLocation + "/" + foldersNameFile;
+        TextAsset textAsset = Resources.Load<TextAsset>(foldersDir);
+        
+        string[] directories = textAsset.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < directories.Length; i++) {
+            directories[i] = dirLocation + "/" + directories[i];
+        }
+        return directories;
+    }
+
+    private string[] GetAllFilesInDir(string dirLocation) {
+        List<string> files = new();
+        var assets = Resources.LoadAll<TextAsset>(dirLocation);
+
+        foreach (var asset in assets) {
+            files.Add(dirLocation + "/" + asset.name);
+        }
+
+        return files.ToArray();
+    }
+    
+    private string[] ReadAllTextFileLines(string fileLocation) {
+        TextAsset textAsset = Resources.Load<TextAsset>(fileLocation);
+        return textAsset.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
     }
 }

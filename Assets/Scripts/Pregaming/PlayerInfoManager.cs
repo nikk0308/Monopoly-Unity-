@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 public class PlayerInfoManager : MonoBehaviour 
 {
@@ -42,10 +40,11 @@ public class PlayerInfoManager : MonoBehaviour
     }
 
     private void Start() {
+        // Here error
+        NamesFill();
         close.onClick.AddListener(CloseWindow);
         startGame.onClick.AddListener(StartGame);
         closeError.onClick.AddListener(CloseError);
-        NamesFill();
         CloseWindow();
     }
     public void OnEnable()
@@ -161,25 +160,29 @@ public class PlayerInfoManager : MonoBehaviour
         errorWindow.gameObject.SetActive(false);
     }
     private void NamesFill() {
-        // var fileNames = Resources.Load<TextAsset>("text_info/names_for_bots/normal_names").ToString();
-        // int startIndex = 0;
-        // int findIndex = fileNames.IndexOf('\n', startIndex);
-        // while (findIndex != -1) {
-        //     _defaultNames.Add(fileNames.Substring(startIndex, findIndex - startIndex));
-        //     startIndex = findIndex + 1;
-        //     findIndex = fileNames.IndexOf('\n', startIndex);
-        // }
-        
-        string fileLocation = "Assets/Resources/text_info/names_for_bots/normal_names.txt";
-        string[] names = File.ReadAllLines(fileLocation);
-        foreach (var name in names) {
-            _defaultNames.Add(name);
+    //     string fileLocation = "Assets/Resources/text_info/names_for_bots/normal_names.txt";
+    //     string[] names = File.ReadAllLines(fileLocation);
+    //     foreach (var name in names) {
+    //         _defaultNames.Add(name);
+    //     }
+    //     
+        string fileLocation = "text_info/names_for_bots/normal_names";
+        TextAsset textAsset = Resources.Load<TextAsset>(fileLocation);
+
+        if (textAsset != null) {
+            string[] names = textAsset.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var name in names) {
+                _defaultNames.Add(name);
+            }
+        } else {
+            Debug.LogError("File not found at: " + fileLocation);
         }
     }
 
     private string RandUniqueName() {
         string nameToReturn;
         do {
+            // Here error
             nameToReturn = _defaultNames[Constants.Rand.Next(0, _defaultNames.Count)];
         } while (IsPlayerNameAlreadyExist(nameToReturn));
         return nameToReturn;

@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class ExitChance : Card
 {
     public override void DoActionIfArrived(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2) {

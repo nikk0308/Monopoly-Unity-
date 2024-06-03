@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class Zrada : Card
 {
     private delegate void Action(Field field, Player player, out bool isUnfinishedMethod, ref string text1, ref string text2);
