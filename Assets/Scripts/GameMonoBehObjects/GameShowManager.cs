@@ -27,6 +27,8 @@ public class GameShowManager : MonoBehaviour {
 
     private List<PlayerShow> _playersList = new();
     private GamePlay _gameLogic;
+
+    public int curActiveWindow;
     public FieldShow FieldToShow => fieldToShow;
     public static GameShowManager Instance { get; private set; }     
     private void Awake() 
@@ -167,7 +169,7 @@ public class GameShowManager : MonoBehaviour {
         }
 
         if (rollDice.GetComponentInChildren<TMP_Text>().text == Constants.BankruptButtonText) {
-            PlayerInfoManager.Instance.ShowError("Гравець " + curPlayer.nameInGame + " погасив борг та повертається до гри!");
+            MessageWindow.Instance.ShowMessage("Гравець " + curPlayer.nameInGame + " погасив борг та повертається до гри!");
         }
         SetButtonText(Constants.NextTurnButtonText);
         GamePlay.Instance.MoveToNextTurn();

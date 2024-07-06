@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -27,6 +28,12 @@ public class ScriptChooseColor : MonoBehaviour, IPointerClickHandler {
         nameInputField.characterLimit = Constants.MaxNameLength;
         save.onClick.AddListener(Save);
         close.onClick.AddListener(CloseWindow);
+    }
+
+    private void Update() {
+        if (Input.GetKeyDown(KeyCode.Return)) {
+            Save();
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData) {
@@ -60,19 +67,27 @@ public class ScriptChooseColor : MonoBehaviour, IPointerClickHandler {
     }
 
     private bool IsInputCorrect() {
+        nameInputField.text = CorrectInputtedName(nameInputField.text);
         if (nameInputField.text.Length < Constants.MinNameLength) {
-            PlayerInfoManager.Instance.ShowError("Ім'я занадто мале");
+            MessageWindow.Instance.ShowMessage("Ім'я занадто мале");
             return false;
         }
         if (PlayerInfoManager.Instance.IsPlayerNameAlreadyExist(nameInputField.text, _objectToEdit.transform.GetSiblingIndex())) {
-            PlayerInfoManager.Instance.ShowError("Таке ім'я вже існує");
+            MessageWindow.Instance.ShowMessage("Таке ім'я вже існує");
             return false;
         }
         if (PlayerInfoManager.Instance.IsSimilarColorExist(imageToShow.color, _objectToEdit.transform.GetSiblingIndex())) {
-            PlayerInfoManager.Instance.ShowError("Схожий колір вже існує");
+            MessageWindow.Instance.ShowMessage("Схожий колір вже існує");
             return false;
         }
         return true;
+    }
+
+    private string CorrectInputtedName(string name) {
+        string returnSymbol = "\n";
+        name = name.Replace(returnSymbol, string.Empty);
+        name = name.Trim(' ');
+        return name;
     }
     
     public void StartEditing(PlayerInfo changeInfo) {
@@ -83,6 +98,8 @@ public class ScriptChooseColor : MonoBehaviour, IPointerClickHandler {
         if (nameInputField.text.Length == 0) {
             close.gameObject.SetActive(false);
         }
+        nameInputField.ActivateInputField();
+        nameInputField.Select();
     }
 
     private void CloseWindow() {

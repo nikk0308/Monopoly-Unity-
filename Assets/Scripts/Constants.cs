@@ -8,6 +8,7 @@ public static class Constants {
     public const int MinPlayersAmount = 2;
     public const int MaxNameLength = 15;
     public const int MinNameLength = 1;
+    public const float InitialVolume = 0.3f;
     
     public static readonly Random Rand = new();
     
@@ -114,7 +115,7 @@ public static class Constants {
     }
     
     // Colors
-    public const double PlayersColorsSimilarityDegree = 0.5;
+    public const double PlayersColorsSimilarityDegree = 0.3;
     public static readonly Color PrimaryPriceColor = Gain256Color(220, 140, 80);
     public static readonly Color CurrentPriceColor = Gain256Color(230, 180, 100);
     public static readonly Color DefaultOutlineColor = Gain256Color(50, 10, 0);

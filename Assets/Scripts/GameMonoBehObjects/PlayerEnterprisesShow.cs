@@ -167,7 +167,7 @@ public class PlayerEnterprisesShow : MonoBehaviour
 
     private void OnClickUnPawnButton() {
         if (Convert.ToInt32(moneyGainOrWaste.text) > Convert.ToInt32(moneyAmount.text)) {
-            PlayerInfoManager.Instance.ShowError("Грошей недостатньо!");
+            MessageWindow.Instance.ShowMessage("Грошей недостатньо!");
             return;
         }
         foreach (var index in _enterpriseIndexes) {
@@ -179,7 +179,7 @@ public class PlayerEnterprisesShow : MonoBehaviour
 
     private void OnClickBuildButton() {
         if (Convert.ToInt32(moneyGainOrWaste.text) > Convert.ToInt32(moneyAmount.text)) {
-            PlayerInfoManager.Instance.ShowError("Грошей недостатньо!");
+            MessageWindow.Instance.ShowMessage("Грошей недостатньо!");
             return;
         }
         foreach (var index in _enterpriseIndexes) {

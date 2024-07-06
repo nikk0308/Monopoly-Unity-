@@ -180,8 +180,8 @@ public class GamePlay
              GameShowManager.Instance.LockDiceButton(false);
              GameShowManager.Instance.LockPreTurnButtons(false);
              if (!curPlayer.IsABot()) {
-                 PlayerInfoManager.Instance.ShowError("Баланс " + curPlayer.nameInGame + " опустився нижче нуля. Необхідно " +
-                                                      "погасити борг, заклавши підприємства, для продовження гри");
+                 MessageWindow.Instance.ShowMessage("Баланс " + curPlayer.nameInGame + " опустився нижче нуля. Необхідно " +
+                                                    "погасити борг, заклавши підприємства, для продовження гри");
              }
              GameShowManager.Instance.PawnInBank();
          }
@@ -212,7 +212,7 @@ public class GamePlay
             GameShowManager.Instance.GameEnded(curPlayer);
         }
         else {
-            PlayerInfoManager.Instance.ShowError("Гравець " + curPlayer.nameInGame + " тепер банкрот");
+            MessageWindow.Instance.ShowMessage("Гравець " + curPlayer.nameInGame + " тепер банкрот");
             MoveToNextTurn();
         }
     }

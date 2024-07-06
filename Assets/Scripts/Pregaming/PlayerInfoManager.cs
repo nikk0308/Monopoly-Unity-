@@ -16,10 +16,6 @@ public class PlayerInfoManager : MonoBehaviour
     [SerializeField] private Button close;
     [SerializeField] private Button startGame;
     [SerializeField] private TMP_Text title;
-
-    [SerializeField] private Image errorWindow;
-    [SerializeField] private TMP_Text errorText;
-    [SerializeField] private Button closeError;
     
     [SerializeField] private Image playGameWindow;
     public bool isWithBots;
@@ -44,7 +40,6 @@ public class PlayerInfoManager : MonoBehaviour
         NamesFill();
         close.onClick.AddListener(CloseWindow);
         startGame.onClick.AddListener(StartGame);
-        closeError.onClick.AddListener(CloseError);
         CloseWindow();
     }
     public void OnEnable()
@@ -57,6 +52,15 @@ public class PlayerInfoManager : MonoBehaviour
         else {
             title.text = "Гра з друзями";
             create.onClick.AddListener(CreatePlayer);
+        }
+    }
+
+    private void Update() {
+        // if (Input.GetKeyDown(KeyCode.Return)) {
+        //     StartGame();
+        // }
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            CloseWindow();
         }
     }
     
@@ -121,17 +125,14 @@ public class PlayerInfoManager : MonoBehaviour
 
     private void StartGame() {
         if (_playerInfo.Count < Constants.MinPlayersAmount) {
-            ShowError("Недостатня кількість гравців");
+            MessageWindow.Instance.ShowMessage("Недостатня кількість гравців");
             return;
         }
         CloseWindow();
         GameShowManager.Instance.EnableWindow();
     }
 
-    public void ShowError(string errorText) {
-        this.errorText.text = errorText;
-        errorWindow.gameObject.SetActive(true);
-    }
+    
 
     public bool IsPlayerNameAlreadyExist(string playerName, int nameIndex = -1) {
         for (int i = 0; i < _playerInfo.Count; i++) {
@@ -154,10 +155,6 @@ public class PlayerInfoManager : MonoBehaviour
 
     private double EvklidColorDistance(Color first, Color second) {
         return Math.Sqrt(Math.Pow(first.r - second.r, 2) + Math.Pow(first.g - second.g, 2) + Math.Pow(first.b - second.b, 2));
-    }
-        
-    private void CloseError() {
-        errorWindow.gameObject.SetActive(false);
     }
     private void NamesFill() {
     //     string fileLocation = "Assets/Resources/text_info/names_for_bots/normal_names.txt";
