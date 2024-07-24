@@ -557,6 +557,7 @@ GameObject:
   - component: {fileID: 929161609589600612}
   - component: {fileID: 2858363282398016467}
   - component: {fileID: 8270759441569358665}
+  - component: {fileID: 8475443822223943325}
   m_Layer: 5
   m_Name: ButtonFriendGame
   m_TagString: Untagged
@@ -666,10 +667,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 8475443822223943325}
+        m_TargetAssemblyTypeName: OpenCompGame, Assembly-CSharp
+        m_MethodName: OpenCompGameObject
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -678,6 +679,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+--- !u!114 &8475443822223943325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4739208914740097087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7aed90793d6df443977a30e4aa1ce4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isWithBots: 0
 --- !u!1 &5578262712994225622
 GameObject:
   m_ObjectHideFlags: 0
@@ -727,6 +741,7 @@ GameObject:
   - component: {fileID: 7133037535935066603}
   - component: {fileID: 5235042383210214900}
   - component: {fileID: 3186122072419642848}
+  - component: {fileID: 8319874016045797806}
   m_Layer: 5
   m_Name: ButtonCompGame
   m_TagString: Untagged
@@ -836,10 +851,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 8319874016045797806}
+        m_TargetAssemblyTypeName: OpenCompGame, Assembly-CSharp
+        m_MethodName: OpenCompGameObject
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -848,6 +863,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+--- !u!114 &8319874016045797806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6554707073859656944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7aed90793d6df443977a30e4aa1ce4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isWithBots: 1
 --- !u!1 &6590254604697506298
 GameObject:
   m_ObjectHideFlags: 0
